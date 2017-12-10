@@ -75,21 +75,33 @@ class DataSet(RNGDataFlow):
         if self.shuffle:
             self.rng.shuffle(idxs)
         for k in idxs:
-            with open(self.files[k], 'rb') as f:
-                jpeg = f.read()
-            jpeg = np.asarray(bytearray(jpeg), dtype='uint8')
-            label = self.labels[k]
-            yield [jpeg, label]
+            # Load image as grayscale
+            file = self.files[k]
+            img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
 
+            # Check if height is 32px
+            h = img.shape[0]
 
-    def isTrainData(self):
+            if h != 32:
+                # Resize to 32px
+                f = 32.0 / h
+                img = cv2.resize(img, None, fx=f, fy=f, interpolation=cv2.INTER_AREA)
+
+            # Encode image data
+            success, raw = cv2.imencode(".png", img)
+
+            if success:
+                png = np.asarray(bytearray(raw), dtype='uint8')
+                label = self.labels[k]
+                yield [png, label]
+
+    def is_train_data(self):
         """
             Checks if the train data set was loaded.
         """
         return self.train_or_test == 'train'
 
-
-    def isTestData(self):
+    def is_test_data(self):
         """
             Checks if the test data set was loaded.
         """

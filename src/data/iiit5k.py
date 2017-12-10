@@ -14,6 +14,8 @@ class IIIT5K(DataSet):
     DATASET_NAME = "IIIT5K"
 
     def load_data(self):
+        """Loads the matching image paths and labels."""
+
         print("Load IIIT5K from " + self.dir)
 
         mat_file = os.path.join(self.dir, self.train_or_test + "data.mat")

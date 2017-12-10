@@ -8,10 +8,12 @@ from data.iiit5k import IIIT5K
 
 # Use this values to toggle between train and test data
 MODE = 'train'
-REUSE_LMDB = True
+REUSE_LMDB = False
 
 
 path = lmdb_path(IIIT5K, MODE)
+
+print("start project: mode={} server={} reuse_lmdb={}".format(MODE, config.IS_SERVER, REUSE_LMDB))
 
 # Check fi the old lmdb file should be removed
 if not REUSE_LMDB:
@@ -28,12 +30,16 @@ if not os.path.exists(path):
 ds = LMDBData(path, shuffle=False)
 ds = LocallyShuffleData(ds, 50000)
 ds = LMDBDataPoint(ds)
-ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_COLOR), 0)
+ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
 
 ds.reset_state()
+ls = list(ds.get_data())
+
+
 
 #Print labels of data
-for (img_str, label) in ds.get_data():
+for (img, label) in ds.get_data():
+    print(img.shape)
     print(label)
 
 
