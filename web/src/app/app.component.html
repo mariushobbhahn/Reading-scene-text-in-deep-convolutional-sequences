@@ -1,0 +1,31 @@
+<div id="header-nav-placeholder" class="mat-elevation-z4"></div>
+<header class="mat-elevation-z4">
+  <div id="header-nav">
+    <a class="app-home-link">CG Praktikum</a>
+    <div id="nav-wrapper">
+      <nav mat-tab-nav-bar>
+          <a mat-tab-link [routerLink]="'home'" routerLinkActive #rlaHome="routerLinkActive" [active]="rlaHome.isActive">
+            Home
+          </a>
+          <a mat-tab-link [routerLink]="'timeline'" routerLinkActive #rlaTl="routerLinkActive" [active]="rlaTl.isActive">
+            Timeline
+          </a>
+
+        </nav>
+    </div>
+  </div>
+  <div class="header-content">
+    <div class="description">
+      <div>
+          Hier entsteht ein exzellentes Projekt für das Praktikum Computergrafik im Wintersemester 2017/2018.
+      </div>
+      <img src="assets/construction.ico" height="100%"/>
+    </div>
+  </div>
+</header>
+<main>
+  <router-outlet></router-outlet>
+</main>
+<footer>
+  <app-footer></app-footer>
+</footer>

@@ -1,0 +1,110 @@
+// Import all the tools needed to customize the theme and extract parts of it
+@import '~@angular/material/theming';
+@import './components/pages/pages.mixin';
+
+// Define a mixin that accepts a theme and outputs the color styles for the component.
+@mixin app-main-theme($theme) {
+  // Extract whichever individual palettes you need from the theme.
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+
+  /* global variable declarations */
+  $header-height: 230px;
+  $footer-height: 48px;
+  $credits-height: 48px;
+
+  // include subthemes
+  @include pages-theme($theme);
+
+  // Use mat-color to extract individual colors from a palette as necessary.
+
+  $header-nav-height: 48px;
+  #header-nav-placeholder {
+    height: $header-nav-height;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+  header {
+    background-color: mat-color($primary);
+    color: #fff;
+    flex: none;
+    width: 100%;
+    height: $header-height;
+    z-index: 100;
+    padding-top: $header-nav-height;
+
+    #header-nav {
+      width: 100%;
+      height: $header-nav-height;
+      position: fixed;
+      z-index: 110;
+      top: 0;
+      left: 0;
+      right: 0;
+      line-height: $header-nav-height;
+      background-color: mat-color($primary, 'darker');
+      display: flex;
+      flex-direction: row;
+
+        .app-home-link {
+          display: block;
+          flex: none;
+          height: $header-nav-height;
+          font-size: 0.5 * $header-nav-height;
+          margin: 0px (0.5 * $header-nav-height);
+        }
+
+        #nav-wrapper {
+          display: block;
+          flex: 1 0 auto;
+        }
+    }
+
+    .header-content {
+      font-size: 2em;
+      color: #000;
+
+      .description {
+        width: 100%;
+        padding: 6px 24px;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        grid-template-rows: 100%;
+      }
+    }
+  }
+
+  main {
+    flex: 1 0 auto;
+    width: 100%;
+  }
+
+  footer {
+    background-color: mat-color($accent, 'darker');
+    flex: none;
+    width: 100%;
+    height: $footer-height;
+    color: rgba(0, 0, 0, 0.7);
+
+    .credits {
+      width: 100%;
+      height: $credits-height;
+      padding: 6px 12px;
+      text-align: center;
+
+      button {
+        display: inline-block;
+        vertical-align: middle;
+        transition: background-color 0.3s ease-out;
+
+        &:hover {
+          background-color: mat-color($accent, 'lighter');
+        }
+      }
+    }
+  }
+}
