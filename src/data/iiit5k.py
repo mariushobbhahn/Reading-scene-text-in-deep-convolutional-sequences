@@ -1,37 +1,44 @@
 import os.path
 import scipy.io
-from data.dataset import DataSet
+
+from data.helper import HelperData
 
 
-__all__ = ['IIIT5K']
-
-
-class IIIT5K(DataSet):
+class IIIT5KHelper(HelperData):
     """
-       Produces [image, label] in IIIT5K dataset,
+       Helper to produce [image, label] from IIIT5K dataset,
     """
 
-    DATASET_NAME = "IIIT5K"
+    def __init__(self, train_or_test, is_char_data):
+        super(IIIT5KHelper, self).__init__("IIIT5K", train_or_test, is_char_data)
 
-    def load_data(self):
-        """Loads the matching image paths and labels."""
+    def _load_mat_file(self):
+        """
+        Loads the test or train matlab file with the given name.
+        :return: A dictionary representing the content of the matlab file.
+        """
+        name = "CharBound"
+        path = os.path.join(self.data_dir(), self.train_or_test + name + ".mat")
+        file = scipy.io.loadmat(path)
+        data_key = self.train_or_test + name
+        return file[data_key][0, ]
 
-        print("Load IIIT5K from " + self.dir)
+    def _load_char_bounds(self):
+        """
+        Loads the image paths, labels and corresponding char bounds.
+        :return:
+        """
 
-        mat_file = os.path.join(self.dir, self.train_or_test + "data.mat")
+        print("Load IIIT5K from " + self.data_dir())
 
-        # load the data set form the mat file
-        data_key = self.train_or_test + "data"
-
-        # Take the array out of the dict and strip the first dimension
-        data = scipy.io.loadmat(mat_file)[data_key][0, ]
-
-        files = []
-        labels = []
+        data = self._load_mat_file()
+        out = []
 
         for i in range(0, len(data)):
-            files.append(os.path.join(self.dir, data[i][0][0]))
-            labels.append(data[i][1][0])
+            path = data[i][0][0]
+            label = data[i][1][0]
+            bounds = data[i][2]
 
-        print("Loaded {} image paths and {} labels".format(len(files), len(labels)))
-        return files, labels
+            out.append((os.path.join(self.data_dir(), path), label, bounds))
+
+        return out
