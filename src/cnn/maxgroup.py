@@ -92,3 +92,25 @@ class MaxGroup(base.Layer):
     outputs = math_ops.reduce_max(pairing, axis=self.axis+1, keep_dims=False)
 
     return outputs
+
+
+
+@layer_register(log_shape=True)
+def pruneaxis(inputs, out_channel, name=None):
+  """
+  prunes axis 1 and two. only call this if inputs.shape[1] == 1 == inputs.shape[2]
+  input: Tensor of shape [batchsize, 1, 1, x]
+  output: Tensor of shape [batchsize, x]
+  """
+  return PruneAxis(out_channel, name=name)(inputs)
+
+class PruneAxis(base.Layer):
+  def __init__(self, out_channel, name=None, **kwargs):
+    super(PruneAxis, self).__init__(name=name, trainable=False, **kwargs)
+    self.out_channel = out_channel
+
+  def call(self, inputs):
+    inputs = ops.convert_to_tensor(inputs)
+    shape = gen_array_ops.shape(inputs)
+    batchsize = shape[0]
+    return gen_array_ops.reshape(inputs, [batchsize, self.out_channel])

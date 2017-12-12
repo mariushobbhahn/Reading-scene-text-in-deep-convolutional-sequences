@@ -40,8 +40,9 @@ def _load_or_create_ds(helper, shuffle):
 
     # Decode images
     ds = LMDBDataPoint(ds)
+    ds = PrintData(ds)
     ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
-
+    ds = PrintData(ds)
     return ds
 
 
@@ -82,8 +83,3 @@ def IIIT5K(train_or_test, char_data=False, shuffle=False):
     helper = IIIT5KHelper(train_or_test, char_data)
     dump_helper(helper)
     return _load_or_create_ds(helper, shuffle)
-
-
-
-
-

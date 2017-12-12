@@ -60,7 +60,8 @@ class HelperData(RNGDataFlow):
 
             if success:
                 png = np.asarray(bytearray(raw), dtype='uint8')
-                yield [png, label]
+                yield [png, int(ord(label) % 36)]
+                # TODO: mapping chars -> int
 
     def _lazy_data(self):
         if self.__data is None:
@@ -105,24 +106,33 @@ class HelperData(RNGDataFlow):
             # Read image and read height
             img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             h = int(img.shape[0])
+            w = int(img.shape[1])
 
             chars = list(label)
 
             # Iterate over each char and their bounding box
             for idx in range(len(chars)):
 
+                if h > w:
+                    continue
+
                 char = chars[idx]
+                #print("Char: {} {}".format(char, type(char)))
                 rect = bounds[idx]
 
+                # print(rect)
+                # print(w)
+                # print(h)
+
                 # Calc mid x of char bounds.
-                x = max(int(rect[0] + (rect[2] - h) / 2), 0)
+                x = min(max(int(rect[0] + (rect[2] - h) / 2), 0), w - h)
                 f = 32.0 / h
 
                 # print("Char: {} bounds: {} subimage: {}:{}, {}:{}".format(char, rect, 0, h, x, (x + h)))
 
                 # Cut out char image and scale it to 32 x 32
                 char_image = img[0:h, x:(x + h)]
-                char_image = cv2.resize(char_image, None, fx=f, fy=f, interpolation=cv2.INTER_AREA)
+                char_image = cv2.resize(char_image, None, fx=f, fy=f)
 
                 # store char and image
                 out.append((char_image, char))
@@ -136,5 +146,3 @@ class HelperData(RNGDataFlow):
 
         :return: a array of paths, labels and array of char bounds.
         """
-
-

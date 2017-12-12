@@ -53,7 +53,8 @@ class Model(ModelDesc):
                         Conv2D('conv3', kernel_shape=8, out_channel=512).
                         maxgroup('max3', 4, 1, axis=3).
                         Conv2D('conv4', kernel_shape=1, out_channel=144).
-                        maxgroup('max4', 4, 1, axis=3)())
+                        maxgroup('max4', 4, 1, axis=3).
+                        pruneaxis('prune', 36)())
                         #FullyConnected('fc', out_dim=10, nl=tf.identity)())
                         #Maxout('max4', num_unit=4))
 
