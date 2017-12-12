@@ -19,6 +19,7 @@ class IIIT5KHelper(HelperData):
         """
         name = "CharBound"
         path = os.path.join(self.data_dir(), self.train_or_test + name + ".mat")
+        print(path)
         file = scipy.io.loadmat(path)
         data_key = self.train_or_test + name
         return file[data_key][0, ]

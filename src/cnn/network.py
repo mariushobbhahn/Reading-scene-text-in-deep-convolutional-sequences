@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import config
+#if (os.path.abspath(os.curdir).find('cnn') != -1):
+#    os.chdir('..')
+import config as cfg
 import os
 import argparse
 import tensorflow as tf
@@ -9,6 +11,7 @@ import tensorflow as tf
 from tensorpack import *
 from tensorpack.tfutils import summary
 from data import dataset
+from cnn import maxgroup
 
 IMAGE_SIZE = 32
 
@@ -29,6 +32,8 @@ class Model(ModelDesc):
         # inputs contains a list of input variables defined above
         image, label = inputs
 
+        print(label)
+
         # In tensorflow, inputs to convolution function are assumed to be
         # NHWC. Add a single channel here.
         image = tf.expand_dims(image, 3)
@@ -40,14 +45,15 @@ class Model(ModelDesc):
         with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.nn.relu):
             logits = (LinearWrap(image).
                         Conv2D('conv0', out_channel=96).
-                        #Maxout('max0', num_unit=2).
+                        maxgroup('max0', 2, 24, axis=3).
                         Conv2D('conv1', out_channel=128).
-                        #Maxout('max1', num_unit=2).
+                        maxgroup('max1', 2, 16, axis=3).
                         Conv2D('conv2', out_channel=256).
-                        #Maxout('max2', num_unit=2).
+                        maxgroup('max2', 2, 8, axis=3).
                         Conv2D('conv3', kernel_shape=8, out_channel=512).
-                        #Maxout('max3', num_unit=4).
-                        Conv2D('conv4', kernel_shape=1, out_channel=144)())
+                        maxgroup('max3', 4, 1, axis=3).
+                        Conv2D('conv4', kernel_shape=1, out_channel=144).
+                        maxgroup('max4', 4, 1, axis=3)())
                         #FullyConnected('fc', out_dim=10, nl=tf.identity)())
                         #Maxout('max4', num_unit=4))
 
@@ -121,8 +127,8 @@ def get_config():
     )
 
 
-if __name__ == '__main__':
-    print("start network: server={}".format(config.IS_SERVER))
+def run():
+    print("start network: server={}".format(cfg.IS_SERVER))
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', help='comma separated list of GPU(s) to use.')

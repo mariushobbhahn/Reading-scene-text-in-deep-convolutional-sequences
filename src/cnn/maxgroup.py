@@ -1,19 +1,19 @@
-import numpy as np
-from tensorflow import constant as constensor
-
-
-## idea for maxgroup, needs evaluated values in this state -> doesnt work in a network
-def maxgroup(image, group, IMAGE_SIZE):
-    # get the Tensor's values
-    npimg = image.eval()
-
-    # reshape the array so <group> feature-maps are put into one array together
-    pairs = np.reshape(npimg, [-1, group, IMAGE_SIZE, IMAGE_SIZE])
-
-    # calculate the elementwise max in each group
-    max = np.amax(pairs, axis=1)
-
-    return constensor(max)
+# import numpy as np
+# from tensorflow import constant as constensor
+#
+#
+# ## idea for maxgroup, needs evaluated values in this state -> doesnt work in a network
+# def maxgroupold(image, group, IMAGE_SIZE):
+#     # get the Tensor's values
+#     npimg = image.eval()
+#
+#     # reshape the array so <group> feature-maps are put into one array together
+#     pairs = np.reshape(npimg, [-1, group, IMAGE_SIZE, IMAGE_SIZE])
+#
+#     # calculate the elementwise max in each group
+#     max = np.amax(pairs, axis=1)
+#
+#     return constensor(max)
 
 from __future__ import absolute_import
 from __future__ import division
@@ -26,8 +26,10 @@ from tensorflow.python.ops import gen_array_ops
 
 from tensorflow.python.layers import base
 
+from tensorpack.models.common import layer_register
 
-def maxgroup(inputs, group, IMAGE_SIZE, name=None):
+@layer_register(log_shape=True)
+def maxgroup(inputs, group, IMAGE_SIZE, axis=3, name=None):
   """Adds a maxgroup op
   "
    Arguments:
@@ -41,7 +43,7 @@ def maxgroup(inputs, group, IMAGE_SIZE, name=None):
    Raises:
     ValueError: if num_units is not multiple of number of features.
   """
-  return MaxGroup(IMAGE_SIZE, group=group, name=name)(inputs)
+  return MaxGroup(IMAGE_SIZE=IMAGE_SIZE, axis=axis, group=group, name=name)(inputs)
 
 
 class MaxGroup(base.Layer):
@@ -62,24 +64,31 @@ class MaxGroup(base.Layer):
   """
 
   def __init__(self,
-         IMAGE_SIZE,
          group=2,
+         axis=3,
+         IMAGE_SIZE=24,
          name=None,
          **kwargs):
     super(MaxGroup, self).__init__(
       name=name, trainable=False, **kwargs)
     self.num_units = group
+    self.size = IMAGE_SIZE
+    self.axis = axis
 
   def call(self, inputs):
     inputs = ops.convert_to_tensor(inputs)
     shape = inputs.shape
-    pairing = gen_array_ops.reshape(inputs, [-1, self.num_units, IMAGE_SIZE, IMAGE_SIZE])
 
-    if shape[0].value % self.num_units:
+    if shape[self.axis] % self.num_units != 0:
       raise ValueError('number of features({}) is not '
                'a multiple of group({})'
-               .format(num_channels, self.num_units))
+               .format(shape[self.axis], self.num_units))
 
-    outputs = math_ops.reduce_max(pairing, axis=1, keep_dims=False)
+    out_channel = int(shape[self.axis].value / self.num_units)
+    # Dealing with batches with arbitrary sizes
+    batchsize = gen_array_ops.shape(inputs)[0]
+
+    pairing = gen_array_ops.reshape(inputs, [batchsize, self.size, self.size, out_channel, self.num_units])
+    outputs = math_ops.reduce_max(pairing, axis=self.axis+1, keep_dims=False)
 
     return outputs
