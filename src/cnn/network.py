@@ -1,21 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import config
 import os
 import argparse
 import tensorflow as tf
-"""
-MNIST ConvNet example.
-about 0.6% validation error after 30 epochs.
-"""
-
 
 # Just import everything into current namespace
 from tensorpack import *
 from tensorpack.tfutils import summary
-from tensorpack.dataflow import dataset
+from data import dataset
 
-IMAGE_SIZE = 28
+IMAGE_SIZE = 32
 
 
 class Model(ModelDesc):
@@ -37,23 +32,28 @@ class Model(ModelDesc):
         # In tensorflow, inputs to convolution function are assumed to be
         # NHWC. Add a single channel here.
         image = tf.expand_dims(image, 3)
-
         image = image * 2 - 1   # center the pixels values at zero
 
-        # The context manager `argscope` sets the default option for all the layers under
-        # this context. Here we use 32 channel convolution with shape 3x3
-        with argscope(Conv2D, kernel_shape=3, nl=tf.nn.relu, out_channel=32):
-            logits = (LinearWrap(image)
-                      .Conv2D('conv0')
-                      .MaxPooling('pool0', 2)
-                      .Conv2D('conv1')
-                      .Conv2D('conv2')
-                      .MaxPooling('pool1', 2)
-                      .Conv2D('conv3')
-                      .FullyConnected('fc0', 512, nl=tf.nn.relu)
-                      .Dropout('dropout', 0.5)
-                      .FullyConnected('fc1', out_dim=10, nl=tf.identity)())
 
+        # The context manager `argscope` sets the default option for all the layers under
+        # this context. Here we use convolution with shape 9x9
+        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.nn.relu):
+            logits = (LinearWrap(image).
+                        Conv2D('conv0', out_channel=96).
+                        #Maxout('max0', num_unit=2).
+                        Conv2D('conv1', out_channel=128).
+                        #Maxout('max1', num_unit=2).
+                        Conv2D('conv2', out_channel=256).
+                        #Maxout('max2', num_unit=2).
+                        Conv2D('conv3', kernel_shape=8, out_channel=512).
+                        #Maxout('max3', num_unit=4).
+                        Conv2D('conv4', kernel_shape=1, out_channel=144)())
+                        #FullyConnected('fc', out_dim=10, nl=tf.identity)())
+                        #Maxout('max4', num_unit=4))
+
+
+
+        #softmax = logits.Softmax('prob')
         tf.nn.softmax(logits, name='prob')   # a Bx10 with probabilities
 
         # a vector of length B with loss of each sample
@@ -94,8 +94,8 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.Mnist('train'), 128)
-    test = BatchData(dataset.Mnist('test'), 256, remainder=True)
+    train = BatchData(dataset.IIIT5K('train', char_data=True), 128)
+    test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
     return train, test
 
 
@@ -122,6 +122,8 @@ def get_config():
 
 
 if __name__ == '__main__':
+    print("start network: server={}".format(config.IS_SERVER))
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', help='comma separated list of GPU(s) to use.')
     parser.add_argument('--load', help='load model')
@@ -129,12 +131,13 @@ if __name__ == '__main__':
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
-    # automatically setup the directory train_log/mnist-convnet for logging
+    # automatically setup the directory for logging
     logger.auto_set_dir()
 
     config = get_config()
     if args.load:
         config.session_init = SaverRestore(args.load)
+
     # SimpleTrainer is slow, this is just a demo.
     # You can use QueueInputTrainer instead
     launch_train_with_config(config, SimpleTrainer())
