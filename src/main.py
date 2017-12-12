@@ -16,7 +16,7 @@ path = lmdb_path(IIIT5K, MODE)
 print("start project: mode={} server={} reuse_lmdb={}".format(MODE, config.IS_SERVER, REUSE_LMDB))
 
 # Check fi the old lmdb file should be removed
-if not REUSE_LMDB:
+if not REUSE_LMDB and os.path.exists(path):
     os.remove(path)
 
 # Check if data set is already stored as lmdb
@@ -41,7 +41,3 @@ ls = list(ds.get_data())
 for (img, label) in ds.get_data():
     print(img.shape)
     print(label)
-
-
-
-
