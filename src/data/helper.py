@@ -42,10 +42,10 @@ def map_char2class(char):
     #print('label: ' + char + '  class: ' + str(index - 22))
     return index - 22
 
-def map_class2char(class):
-    if (class > 25):
-        return str(class - 26)
-    return chr(class + 97)
+def map_class2char(charclass):
+    if (charclass > 25):
+        return str(charclass - 26)
+    return chr(charclass + 97)
 
 class HelperData(RNGDataFlow):
     """

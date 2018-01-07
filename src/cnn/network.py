@@ -90,7 +90,7 @@ class Model(ModelDesc):
 
     def _get_optimizer(self):
         lr = tf.train.exponential_decay(
-            learning_rate=1e-3,
+            learning_rate=1e-2,
             global_step=get_global_step_var(),
             decay_steps=468 * 10,
             decay_rate=0.3, staircase=True, name='learning_rate')
