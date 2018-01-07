@@ -40,6 +40,6 @@ class IIIT5KHelper(HelperData):
             label = data[i][1][0]
             bounds = data[i][2]
 
-            out.append((os.path.join(self.data_dir(), path), label, bounds))
+            out.append((os.path.join(self.data_dir(), path), label.lower(), bounds))
 
         return out
