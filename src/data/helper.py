@@ -128,16 +128,19 @@ class HelperData(RNGDataFlow):
                 x = min(max(int(rect[0] + (rect[2] - h) / 2), 0), w - h)
                 f = 32.0 / h
 
-                # print("Char: {} bounds: {} subimage: {}:{}, {}:{}".format(char, rect, 0, h, x, (x + h)))
+
+
+                # print("Char: } bounds: {} subimage: {}:{}, {}:{}".format(char, rect, 0, h, x, (x + h)))
 
                 # Cut out char image and scale it to 32 x 32
                 char_image = img[0:h, x:(x + h)]
                 char_image = cv2.resize(char_image, None, fx=f, fy=f)
 
-                # store char and image
-                out.append((char_image, char))
-
+                if (int(char_image.shape[1]) == 32):
+                    # store char and image
+                    out.append((char_image, char))
         return out
+
 
     @abstractmethod
     def _load_char_bounds(self):
