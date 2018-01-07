@@ -2,11 +2,18 @@ import cv2
 import numpy as np
 import os.path
 import config
+import string
 
 from abc import abstractmethod
 
 from tensorpack.dataflow.base import RNGDataFlow
 
+
+def convert_char_to_int(char):
+    if char in string.ascii_lowercase:
+        return string.ascii_lowercase.index(char)
+    else:
+        return int(char) + 26
 
 def _read_image(path):
     """
@@ -60,7 +67,8 @@ class HelperData(RNGDataFlow):
 
             if success:
                 png = np.asarray(bytearray(raw), dtype='uint8')
-                yield [png, int(ord(label) % 36)]
+                #yield [png, int(ord(label) % 36)]
+                yield [png, convert_char_to_int(label)]
                 # TODO: mapping chars -> int
 
     def _lazy_data(self):
@@ -109,6 +117,7 @@ class HelperData(RNGDataFlow):
             w = int(img.shape[1])
 
             chars = list(label)
+            # print("Chars: {}".format(chars))
 
             # Iterate over each char and their bounding box
             for idx in range(len(chars)):
@@ -138,6 +147,7 @@ class HelperData(RNGDataFlow):
 
                 if (int(char_image.shape[1]) == 32):
                     # store char and image
+                    # print("Appended label {}".format(char))
                     out.append((char_image, char))
         return out
 

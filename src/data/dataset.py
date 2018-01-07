@@ -8,7 +8,7 @@ from data.iiit5k import IIIT5KHelper
 from tensorpack.dataflow.dftools import dump_dataflow_to_lmdb
 
 
-DUMP=False
+DUMP=True
 
 def _lmdb_file(name, train_or_test, char_data):
     str = "_chars" if char_data else ""
@@ -65,7 +65,7 @@ def dump_helper(helper, output_dir=None, count=100):
     data = itertools.islice(helper.get_data(), count)
 
     if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
     print("Dump to {}".format(output_dir))
 
     for raw, label in data:
@@ -86,6 +86,6 @@ def IIIT5K(train_or_test, char_data=False, shuffle=False):
     helper = IIIT5KHelper(train_or_test, char_data)
 
     if DUMP:
-        dump_helper(helper)
+        dump_helper(helper, count=300)
 
     return _load_or_create_ds(helper, shuffle)
