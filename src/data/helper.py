@@ -27,6 +27,18 @@ def _read_image(path):
 
     return img
 
+def map_char2class(char):
+    index = int(ord(char.lower()))
+    # for a-z
+    if index > 60:
+        index = index - 75
+    #print('label: ' + char + '  class: ' + str(index - 22))
+    return index - 22
+
+def map_class2char(class):
+    if (class > 25):
+        return str(class - 26)
+    return chr(class + 97)
 
 class HelperData(RNGDataFlow):
     """
@@ -60,7 +72,7 @@ class HelperData(RNGDataFlow):
 
             if success:
                 png = np.asarray(bytearray(raw), dtype='uint8')
-                yield [png, int(ord(label) % 36)]
+                yield [png, map_char2class(label)]
                 # TODO: mapping chars -> int
 
     def _lazy_data(self):
