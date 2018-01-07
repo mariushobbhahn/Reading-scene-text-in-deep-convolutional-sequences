@@ -11,3 +11,7 @@ IS_SERVER = os.path.exists(__SERVER_DATA)
 
 
 DATA_DIR = __SERVER_DATA if IS_SERVER else __LOCAL_DATA
+
+
+DUMP_DATABASES = False
+REMOVE_LMDB = False
