@@ -8,6 +8,7 @@ from data.iiit5k import IIIT5KHelper
 from tensorpack.dataflow.dftools import dump_dataflow_to_lmdb
 
 
+DUMP=False
 
 def _lmdb_file(name, train_or_test, char_data):
     str = "_chars" if char_data else ""
@@ -38,11 +39,13 @@ def _load_or_create_ds(helper, shuffle):
     if shuffle:
         ds = LocallyShuffleData(ds, 50000)
 
+    ds = PrefetchData(ds, 5000, 1)
+
     # Decode images
     ds = LMDBDataPoint(ds)
-    ds = PrintData(ds)
     ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
-    ds = PrintData(ds)
+    ds = PrefetchDataZMQ(ds, 25)
+
     return ds
 
 
@@ -81,5 +84,8 @@ def IIIT5K(train_or_test, char_data=False, shuffle=False):
     :return:
     """
     helper = IIIT5KHelper(train_or_test, char_data)
-    dump_helper(helper)
+
+    if DUMP:
+        dump_helper(helper)
+        
     return _load_or_create_ds(helper, shuffle)
