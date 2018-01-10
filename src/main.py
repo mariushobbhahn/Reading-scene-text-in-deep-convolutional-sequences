@@ -9,6 +9,7 @@ def main(argv):
     config.DUMP_DATABASES = "-d" in argv
     config.REMOVE_LMDB = "-r" in argv
 
+
     network.run()
 
 
