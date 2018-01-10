@@ -10,6 +10,7 @@ import tensorflow as tf
 # Just import everything into current namespace
 from tensorpack import *
 from tensorpack.tfutils import summary
+from tensorflow.python.platform import flags
 from data import dataset
 from cnn import maxgroup
 
@@ -90,7 +91,7 @@ class Model(ModelDesc):
 
     def _get_optimizer(self):
         lr = tf.train.exponential_decay(
-            learning_rate=1e-2,
+            learning_rate=0.1,#1e-2,
             global_step=get_global_step_var(),
             decay_steps=468 * 10,
             decay_rate=0.3, staircase=True, name='learning_rate')
@@ -138,8 +139,11 @@ def run():
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
+
+
     # automatically setup the directory for logging
-    logger.auto_set_dir()
+    logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
+
 
     config = get_config()
     if args.load:
