@@ -90,14 +90,16 @@ class Model(ModelDesc):
         summary.add_param_summary(('.*/W', ['histogram', 'rms']))
 
     def _get_optimizer(self):
+        # decy every 5 epoches by 0.95
         lr = tf.train.exponential_decay(
             learning_rate=0.1,#1e-2,
             global_step=get_global_step_var(),
-            decay_steps=468 * 10,
-            decay_rate=0.3, staircase=True, name='learning_rate')
+            decay_steps=74 * 5,
+            decay_rate=0.95, staircase=True, name='learning_rate')
         # This will also put the summary in tensorboard, stat.json and print in terminal
         # but this time without moving average
         tf.summary.scalar('lr', lr)
+
         return tf.train.AdamOptimizer(lr)
 
 
