@@ -30,7 +30,7 @@ TODOs:
 
 input = [] #sequence of vectors (128d)
 frame_size = 128 #len(input[0])
-batch_size = len(input)
+batch_size = 1 #sollte tf irgendwann für uns regeln gibt die Zahl an parallelen Prozessen an
 
 lstm1 = tf.contrib.rnn.BasicLSTMCell(frame_size)
 lstm2 = tf.contrib.rnn.BasicLSTMCell(frame_size)
@@ -40,12 +40,18 @@ hidden_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
 current_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
 state_1 = hidden_state_1, current_state_1
 
-hidden_state_2, current_state_2, state_2 = hidden_state_1, current_state_1, state_1
-
-print(state_1)
+#hidden_state_2, current_state_2, state_2 = hidden_state_1, current_state_1, state_1
 
 
 for i in range(batch_size):
     # The value of state is updated after processing each batch of words.
     output_1, state_1 = lstm1(input[i], state_1)
-    output_2, state_2 = lstm2(input[len(input) - i], state_2)
+    #output_2, state_2 = lstm2(input[len(input) - i], state_2)
+
+    softmax_c = tf.nn.softmax(output_1) #softmax on the
+    logits = tf.matmul(output_1, softmax_c) #fully connected layer
+    probabilities.append(tf.nn.softmax(logits))
+    #there is no loss function, since at this point we do not have a reasonable comparison
+
+
+#now we need to take our CTC and let it run over the probability vectors
