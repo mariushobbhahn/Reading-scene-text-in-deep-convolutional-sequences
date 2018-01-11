@@ -4,6 +4,9 @@
 # ignore data
 res/data/
 
+# ignore logs
+src/train_log/
+
 *.DS_Store
 
 # Created by .ignore support plugin (hsz.mobi)

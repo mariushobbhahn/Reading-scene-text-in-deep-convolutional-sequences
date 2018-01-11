@@ -2,11 +2,18 @@ import cv2
 import numpy as np
 import os.path
 import config
+import string
 
 from abc import abstractmethod
 
 from tensorpack.dataflow.base import RNGDataFlow
 
+
+def convert_char_to_int(char):
+    if char in string.ascii_lowercase:
+        return string.ascii_lowercase.index(char)
+    else:
+        return int(char) + 26
 
 def _read_image(path):
     """
@@ -27,6 +34,18 @@ def _read_image(path):
 
     return img
 
+def map_char2class(char):
+    index = int(ord(char.lower()))
+    # for a-z
+    if index > 60:
+        index = index - 75
+    #print('label: ' + char + '  class: ' + str(index - 22))
+    return index - 22
+
+def map_class2char(charclass):
+    if (charclass > 25):
+        return str(charclass - 26)
+    return chr(charclass + 97)
 
 class HelperData(RNGDataFlow):
     """
@@ -60,8 +79,7 @@ class HelperData(RNGDataFlow):
 
             if success:
                 png = np.asarray(bytearray(raw), dtype='uint8')
-                yield [png, int(ord(label) % 36)]
-                # TODO: mapping chars -> int
+                yield [png, map_char2class(label)]
 
     def _lazy_data(self):
         if self.__data is None:
@@ -109,6 +127,7 @@ class HelperData(RNGDataFlow):
             w = int(img.shape[1])
 
             chars = list(label)
+            # print("Chars: {}".format(chars))
 
             # Iterate over each char and their bounding box
             for idx in range(len(chars)):
@@ -138,6 +157,7 @@ class HelperData(RNGDataFlow):
 
                 if (int(char_image.shape[1]) == 32):
                     # store char and image
+                    # print("Appended label {}".format(char))
                     out.append((char_image, char))
         return out
 
