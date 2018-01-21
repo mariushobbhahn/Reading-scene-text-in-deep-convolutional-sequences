@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-
 import config
 
 from cnn import network

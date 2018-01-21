@@ -47,7 +47,6 @@ def load_lmdb(named_df):
     Loads a LMDBDataFlow for the given named data set.
 
     :param named_df: The NamedDataSet for which the LMDB file should be loaded.
-    :param reuse: reuses .mdb file from previous run. Default is True
     :return: A LMDBDataFlow which contains the same data points as the named df.
     """
     # The path where the .mdb file should be located

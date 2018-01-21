@@ -1,6 +1,5 @@
 import os.path
-import scipy.io
-import config
+import scipy.io as sp
 
 from data.utils import *
 from data.named_data import NamedDataFlow
@@ -40,7 +39,7 @@ class IIIT5K(NamedDataFlow):
             path = os.path.join(self.data_dir, self.train_or_test + "CharBound.mat")
 
             # Tries to load the matlab file
-            self._cached_file = scipy.io.loadmat(path)[key][0, ]
+            self._cached_file = sp.loadmat(path)[key][0, ]
 
         return self._cached_file
 
@@ -101,7 +100,7 @@ class IIIT5KChar(IIIT5K):
             chars = list(label)
             (img_height, img_width) = img.shape
 
-            #print("Check size: {}x{}".format(img_width, img_height))
+            # print("Check size: {}x{}".format(img_width, img_height))
             # Skip images where no quadratic frame could be cut off
             if img_height > img_width:
                 continue
@@ -122,15 +121,15 @@ class IIIT5KChar(IIIT5K):
                 # clamp to keep inside image (0 <= x <= MAX_x)
                 x = max(0, min(x, max_x))
 
-                #print("cut image in rect ({}, {}, {}, {})".format(x, 0, img_height, img_height))
+                # print("cut image in rect ({}, {}, {}, {})".format(x, 0, img_height, img_height))
 
                 # cut off character image
                 char_img = img[0:img_height, x:(x + img_height)]
 
-                #print("char image size: {}".format(char_img.shape))
+                # print("char image size: {}".format(char_img.shape))
                 # Scale to 32x32
                 if img_height != 32:
                     char_img = cv2.resize(char_img, None, fx=scale, fy=scale)
 
-                #print("Yield image for char {} with label {}".format(char, char_to_int_label(char)))
+                # print("Yield image for char {} with label {}".format(char, char_to_int_label(char)))
                 yield (char_img, char_to_int_label(char))
