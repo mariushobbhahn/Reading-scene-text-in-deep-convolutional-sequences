@@ -44,7 +44,7 @@ class Model(ModelDesc):
 
         # The context manager `argscope` sets the default option for all the layers under
         # this context. Here we use convolution with shape 9x9
-        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.nn.relu):
+        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.identity, W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
             logits = (LinearWrap(image).
                         Conv2D('conv0', out_channel=96).
                         maxgroup('max0', 2, 24, axis=3).
@@ -58,7 +58,10 @@ class Model(ModelDesc):
                         #TODO replace with FullyConnected?
                         maxgroup('max4', 4, 1, axis=3).
                         #TODO check if needed
-                        FullyConnected('fc', out_dim=36, nl=tf.nn.relu)())
+                        FullyConnected('fc', out_dim=36, nl=tf.nn.relu, b_init=tf.contrib.layers.variance_scaling_initializer(1.0))())
+                        #pruneaxis('prune', 36)())
+                        #FullyConnected('fc', out_dim=10, nl=tf.identity)())
+                        #Maxout('max4', num_unit=4))
 
 
 
@@ -66,6 +69,7 @@ class Model(ModelDesc):
         # TODO check
         # tf.nn.softmax(logits, name='prob')   # a Bx10 with probabilities
 
+        # logits = tf.Print(logits, [tf.nn.softmax(logits, name='sm')], summarize=360)
         # a vector of length B with loss of each sample
         cost = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=label)
         cost = tf.reduce_mean(cost, name='cross_entropy_loss')  # the average cross-entropy loss
@@ -94,12 +98,12 @@ class Model(ModelDesc):
         summary.add_param_summary(('.*/W', ['histogram', 'rms']))
 
     def _get_optimizer(self):
-        # decy every 5 epoches by 0.95
+        # decay every x epoches by lr_decay_rate
         lr = tf.train.exponential_decay(
             learning_rate=1e-3,
             global_step=get_global_step_var(),
-            decay_steps=5000,#74 * 5,
-            decay_rate=0.95, staircase=True, name='learning_rate')
+            decay_steps=10 * self.steps_per_epoch,#74 * 5,
+            decay_rate=self.lr_decay_rate, staircase=True, name='learning_rate')
         # This will also put the summary in tensorboard, stat.json and print in terminal
         # but this time without moving average
         tf.summary.scalar('lr', lr)
@@ -108,9 +112,13 @@ class Model(ModelDesc):
 
 
 def get_data():
-
     train = data.utils.load_lmdb(IIIT5KChar('train'))
     test = data.utils.load_lmdb(IIIT5KChar('test'))
+    
+    #if training with subdata
+    #train = dataset.SubData(train, start=16, count=4096, step=1)
+    #if training with unique data (i.e. each class exactly once)
+    #train = dataset.UniqueData(train)
 
     # check if train data should be dumped.
     if cfg.DUMP_DIR:
@@ -124,10 +132,18 @@ def get_config():
     # How many iterations you want in each epoch.
     # This is the default value, don't actually need to set it in the config
     steps_per_epoch = dataset_train.size()
+    steps_per_epoch = 2 #TODO: remove this for actual training
+    max_epoch = 1000
+    lr_decay_rate = 0.98
+
+    model = Model()
+    model.steps_per_epoch = steps_per_epoch
+    model.max_epoch = max_epoch
+    model.lr_decay_rate = lr_decay_rate
 
     # get the config which contains everything necessary in a training
     return TrainConfig(
-        model=Model(),
+        model=model,
         dataflow=dataset_train,  # the DataFlow instance for training
         callbacks=[
             ModelSaver(),   # save the model after every epoch
@@ -137,8 +153,8 @@ def get_config():
             #    dataset_test,   # the DataFlow instance used for validation
             #    ScalarStats(['cross_entropy_loss', 'accuracy'])),
         ],
-        steps_per_epoch=steps_per_epoch,#TODO change back to steps_per_epoch
-        max_epoch=1000,
+        steps_per_epoch=steps_per_epoch,
+        max_epoch=max_epoch
     )
 
 
