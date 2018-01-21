@@ -149,9 +149,9 @@ def get_config():
             ModelSaver(),   # save the model after every epoch
             MaxSaver('validation_accuracy'),  # save the model with highest accuracy (prefix 'validation_')
             #TODO enable inference
-            #InferenceRunner(    # run inference(for validation) after every epoch
-            #    dataset_test,   # the DataFlow instance used for validation
-            #    ScalarStats(['cross_entropy_loss', 'accuracy'])),
+            InferenceRunner(    # run inference(for validation) after every epoch
+                dataset_test,   # the DataFlow instance used for validation
+                ScalarStats(['cross_entropy_loss', 'accuracy'])),
         ],
         steps_per_epoch=steps_per_epoch,
         max_epoch=max_epoch
