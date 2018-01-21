@@ -3,15 +3,14 @@
 #if (os.path.abspath(os.curdir).find('cnn') != -1):
 #    os.chdir('..')
 import config as cfg
-import os
-import argparse
 import tensorflow as tf
+import data.utils
 
 # Just import everything into current namespace
 from tensorpack import *
 from tensorpack.tfutils import summary
 from tensorflow.python.platform import flags
-from data import dataset
+from data.iiit5k import *
 from cnn import maxgroup
 
 IMAGE_SIZE = 32
@@ -35,7 +34,7 @@ class Model(ModelDesc):
 
         #TODO schreibe bilder
 
-        label = tf.Print(label, [label]);
+        label = tf.Print(label, [label])
 
         # In tensorflow, inputs to convolution function are assumed to be
         # NHWC. Add a single channel here.
@@ -78,6 +77,7 @@ class Model(ModelDesc):
         correct = tf.cast(tf.nn.in_top_k(logits, label, 1), tf.float32, name='correct')
         accuracy = tf.reduce_mean(correct, name='accuracy')
 
+
         # This will monitor training error (in a moving_average fashion):
         # 1. write the value to tensosrboard
         # 2. write the value to stat.json
@@ -87,11 +87,12 @@ class Model(ModelDesc):
 
         # Use a regex to find parameters to apply weight decay.
         # Here we apply a weight decay on all W (weight matrix) of all fc layers
-        wd_cost = tf.multiply(1e-5,
-                              regularize_cost('fc.*/W', tf.nn.l2_loss),
-                              name='regularize_loss')
-        self.cost = tf.add_n([wd_cost, cost], name='total_cost')
-        summary.add_moving_summary(cost, wd_cost, self.cost)
+        #wd_cost = tf.multiply(1e-5,
+        #                      regularize_cost('fc.*/W', tf.nn.l2_loss),
+        #                      name='regularize_loss')
+        self.cost = tf.add_n([cost], name='total_cost')
+        summary.add_moving_summary(cost, self.cost)
+
 
         # monitor histogram of all weight (of conv and fc layers) in tensorboard
         summary.add_param_summary(('.*/W', ['histogram', 'rms']))
@@ -111,9 +112,19 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.SubData(dataset.IIIT5K('train', char_data=True), start=16, count=4096, step=1, all_data=True), 128) #TODO change back to 128
-    test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
-    return train, test
+    train = data.utils.load_lmdb(IIIT5KChar('train'))
+    test = data.utils.load_lmdb(IIIT5KChar('test'))
+    
+    #if training with subdata
+    #train = dataset.SubData(train, start=16, count=4096, step=1)
+    #if training with unique data (i.e. each class exactly once)
+    #train = dataset.UniqueData(train)
+
+    # check if train data should be dumped.
+    if cfg.DUMP_DIR:
+        data.utils.dump_data(train, cfg.DUMP_DIR)
+
+    return BatchData(train, 128), BatchData(test, 256, remainder=True)
 
 
 def get_config():
@@ -143,27 +154,16 @@ def get_config():
             #    ScalarStats(['cross_entropy_loss', 'accuracy'])),
         ],
         steps_per_epoch=steps_per_epoch,
-        max_epoch=max_epoch,
+        max_epoch=max_epoch
     )
 
 
-def run():
-    print("start network: server={}".format(cfg.IS_SERVER))
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', help='comma separated list of GPU(s) to use.')
-    parser.add_argument('--load', help='load model')
-    args = parser.parse_args()
-    if args.gpu:
-        os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-
-
-
+def run(args):
     # automatically setup the directory for logging
     logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
 
-
     config = get_config()
+
     if args.load:
         config.session_init = SaverRestore(args.load)
 
