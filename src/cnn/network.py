@@ -59,10 +59,7 @@ class Model(ModelDesc):
                         #TODO replace with FullyConnected?
                         maxgroup('max4', 4, 1, axis=3).
                         #TODO check if needed
-                        FullyConnected('fc', out_dim=36, nl=tf.identity)())
-                        #pruneaxis('prune', 36)())
-                        #FullyConnected('fc', out_dim=10, nl=tf.identity)())
-                        #Maxout('max4', num_unit=4))
+                        FullyConnected('fc', out_dim=36, nl=tf.nn.relu)())
 
 
 
@@ -77,6 +74,7 @@ class Model(ModelDesc):
         correct = tf.cast(tf.nn.in_top_k(logits, label, 1), tf.float32, name='correct')
         accuracy = tf.reduce_mean(correct, name='accuracy')
 
+
         # This will monitor training error (in a moving_average fashion):
         # 1. write the value to tensosrboard
         # 2. write the value to stat.json
@@ -86,11 +84,12 @@ class Model(ModelDesc):
 
         # Use a regex to find parameters to apply weight decay.
         # Here we apply a weight decay on all W (weight matrix) of all fc layers
-        wd_cost = tf.multiply(1e-5,
-                              regularize_cost('fc.*/W', tf.nn.l2_loss),
-                              name='regularize_loss')
-        self.cost = tf.add_n([wd_cost, cost], name='total_cost')
-        summary.add_moving_summary(cost, wd_cost, self.cost)
+        #wd_cost = tf.multiply(1e-5,
+        #                      regularize_cost('fc.*/W', tf.nn.l2_loss),
+        #                      name='regularize_loss')
+        self.cost = tf.add_n([cost], name='total_cost')
+        summary.add_moving_summary(cost, self.cost)
+
 
         # monitor histogram of all weight (of conv and fc layers) in tensorboard
         summary.add_param_summary(('.*/W', ['histogram', 'rms']))
@@ -110,7 +109,7 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.SubData(dataset.IIIT5K('train', char_data=True), start=16, count=2, step=20), 2) #TODO change back to 128
+    train = BatchData(dataset.IIIT5K('train', char_data=True), 128) #TODO change back to 128
     test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
     return train, test
 
