@@ -6,8 +6,8 @@ from cnn import network
 
 
 def main(argv):
-    config.DUMP_DATABASES = "-d" in argv
-    config.REMOVE_LMDB = "-r" in argv
+    config.DUMP_DATABASES = True#"-d" in argv
+    config.REMOVE_LMDB = False#"-r" in argv
 
 
     network.run()

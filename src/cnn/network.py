@@ -33,7 +33,9 @@ class Model(ModelDesc):
         # inputs contains a list of input variables defined above
         image, label = inputs
 
-        print(label)
+        #TODO schreibe bilder
+
+        label = tf.Print(label, [label])
 
         # In tensorflow, inputs to convolution function are assumed to be
         # NHWC. Add a single channel here.
@@ -54,15 +56,19 @@ class Model(ModelDesc):
                         Conv2D('conv3', kernel_shape=8, out_channel=512).
                         maxgroup('max3', 4, 1, axis=3).
                         Conv2D('conv4', kernel_shape=1, out_channel=144).
+                        #TODO replace with FullyConnected?
                         maxgroup('max4', 4, 1, axis=3).
-                        pruneaxis('prune', 36)())
+                        #TODO check if needed
+                        FullyConnected('fc', out_dim=36, nl=tf.identity)())
+                        #pruneaxis('prune', 36)())
                         #FullyConnected('fc', out_dim=10, nl=tf.identity)())
                         #Maxout('max4', num_unit=4))
 
 
 
         #softmax = logits.Softmax('prob')
-        tf.nn.softmax(logits, name='prob')   # a Bx10 with probabilities
+        # TODO check
+        # tf.nn.softmax(logits, name='prob')   # a Bx10 with probabilities
 
         # a vector of length B with loss of each sample
         cost = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=label)
@@ -92,9 +98,9 @@ class Model(ModelDesc):
     def _get_optimizer(self):
         # decy every 5 epoches by 0.95
         lr = tf.train.exponential_decay(
-            learning_rate=0.1,#1e-2,
+            learning_rate=1e-3,
             global_step=get_global_step_var(),
-            decay_steps=74 * 5,
+            decay_steps=5000,#74 * 5,
             decay_rate=0.95, staircase=True, name='learning_rate')
         # This will also put the summary in tensorboard, stat.json and print in terminal
         # but this time without moving average
@@ -104,7 +110,7 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.IIIT5K('train', char_data=True), 128)
+    train = BatchData(dataset.SubData(dataset.IIIT5K('train', char_data=True), start=16, count=2, step=20), 2) #TODO change back to 128
     test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
     return train, test
 
@@ -122,12 +128,13 @@ def get_config():
         callbacks=[
             ModelSaver(),   # save the model after every epoch
             MaxSaver('validation_accuracy'),  # save the model with highest accuracy (prefix 'validation_')
-            InferenceRunner(    # run inference(for validation) after every epoch
-                dataset_test,   # the DataFlow instance used for validation
-                ScalarStats(['cross_entropy_loss', 'accuracy'])),
+            #TODO enable inference
+            #InferenceRunner(    # run inference(for validation) after every epoch
+            #    dataset_test,   # the DataFlow instance used for validation
+            #    ScalarStats(['cross_entropy_loss', 'accuracy'])),
         ],
-        steps_per_epoch=steps_per_epoch,
-        max_epoch=100,
+        steps_per_epoch=2,#TODO change back to steps_per_epoch
+        max_epoch=1000,
     )
 
 

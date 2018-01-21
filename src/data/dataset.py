@@ -5,6 +5,7 @@ import itertools
 
 from tensorpack.dataflow import *
 from data.iiit5k import IIIT5KHelper
+from tensorpack.dataflow.base import RNGDataFlow
 from tensorpack.dataflow.dftools import dump_dataflow_to_lmdb
 
 
@@ -51,7 +52,7 @@ def _load_or_create_ds(helper, shuffle):
     return ds
 
 
-def dump_helper(helper, output_dir=None, count=100):
+def dump_helper(helper, output_dir=None, count=100, step=1):
     """
     Dumps the given amout of images form the helper data.
 
@@ -64,7 +65,7 @@ def dump_helper(helper, output_dir=None, count=100):
         s = "_char" if helper.is_char_data else ""
         output_dir = os.path.join(config.DATA_DIR, "dump_{}_{}{}".format(helper.name, helper.train_or_test, s))
 
-    data = itertools.islice(helper.get_data(), count)
+    data = itertools.islice(helper.get_data(), 0, count * step, step)
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
@@ -75,6 +76,22 @@ def dump_helper(helper, output_dir=None, count=100):
         file = os.path.join(output_dir, "{}.png".format(label))
         cv2.imwrite(file, img)
 
+
+class SubData(RNGDataFlow):
+    def __init__(self, data, count, start=0, step=8):
+        self.start = start
+        self.step = step
+        self.count = count
+        self.data = data
+        self.reset_state()
+
+    def get_data(self):
+        elem = itertools.islice(self.data.get_data(), self.start, self.start + self.count * self.step, self.step)
+        for img, label in elem:
+            yield [img, label]
+
+    def size(self):
+        return self.count
 
 def IIIT5K(train_or_test, char_data=False, shuffle=False):
     """
@@ -88,6 +105,6 @@ def IIIT5K(train_or_test, char_data=False, shuffle=False):
     helper = IIIT5KHelper(train_or_test, char_data)
 
     if config.DUMP_DATABASES:
-        dump_helper(helper, count=100)
+        dump_helper(helper, count=3, step=8)
 
     return _load_or_create_ds(helper, shuffle)

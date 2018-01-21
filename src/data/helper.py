@@ -47,6 +47,8 @@ def map_class2char(charclass):
         return str(charclass - 26)
     return chr(charclass + 97)
 
+
+
 class HelperData(RNGDataFlow):
     """
        Produces a data set of [image, label].

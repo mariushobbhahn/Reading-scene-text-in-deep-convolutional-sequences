@@ -11,4 +11,4 @@ CGPOOL="$LOGIN@cgpool120$POOL.informatik.uni-tuebingen.de"
 CGCONTACT="$LOGIN@cgcontact.informatik.uni-tuebingen.de"
 
 # Connect and enter password
-$DIR/pw.sh $PASSWORD ssh -tt $CGCONTACT "ssh -tt $CGPOOL $@"
+$DIR/pw.sh $PASSWORD ssh -C -L 6006:127.0.0.1:6006 -tt $CGCONTACT "ssh -C -L 6006:127.0.0.1:6006 -tt $CGPOOL $@"
