@@ -80,15 +80,21 @@ def dump_helper(helper, output_dir=None, count=100, step=1):
 
 
 class SubData(RNGDataFlow):
-    def __init__(self, data, count, start=0, step=8):
+    def __init__(self, data, count, start=0, step=8, all_data=False):
         self.start = start
         self.step = step
-        self.count = count
         self.data = data
+        self.all_data = all_data
+        if (all_data):
+            self.count = self.data.size()
+        else:
+            self.count = count
         self.reset_state()
 
     def get_data(self):
-        elem = itertools.islice(self.data.get_data(), self.start, self.start + self.count * self.step, self.step)
+        elem = self.data.get_data()
+        if not self.all_data:
+            elem = itertools.islice(elem, self.start, self.start + self.count * self.step, self.step)
         for img, label in elem:
             yield [img, label]
 

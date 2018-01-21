@@ -45,7 +45,7 @@ class Model(ModelDesc):
 
         # The context manager `argscope` sets the default option for all the layers under
         # this context. Here we use convolution with shape 9x9
-        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.identity, W_init=tf.contrib.layers.variance_scaling_initializer(1.0/81)):
+        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.identity, W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
             logits = (LinearWrap(image).
                         Conv2D('conv0', out_channel=96).
                         maxgroup('max0', 2, 24, axis=3).
@@ -53,9 +53,9 @@ class Model(ModelDesc):
                         maxgroup('max1', 2, 16, axis=3).
                         Conv2D('conv2', out_channel=256).
                         maxgroup('max2', 2, 8, axis=3).
-                        Conv2D('conv3', kernel_shape=8, out_channel=512, W_init=tf.contrib.layers.variance_scaling_initializer(1.0/64)).
+                        Conv2D('conv3', kernel_shape=8, out_channel=512).
                         maxgroup('max3', 4, 1, axis=3).
-                        Conv2D('conv4', kernel_shape=1, out_channel=144, W_init=tf.contrib.layers.variance_scaling_initializer(1.0)).
+                        Conv2D('conv4', kernel_shape=1, out_channel=144).
                         #TODO replace with FullyConnected?
                         maxgroup('max4', 4, 1, axis=3).
                         #TODO check if needed
@@ -111,7 +111,7 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.SubData(dataset.IIIT5K('train', char_data=True), start=16, count=2048, step=1), 36) #TODO change back to 128
+    train = BatchData(dataset.SubData(dataset.IIIT5K('train', char_data=True), start=16, count=4096, step=1, all_data=True), 128) #TODO change back to 128
     test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
     return train, test
 
