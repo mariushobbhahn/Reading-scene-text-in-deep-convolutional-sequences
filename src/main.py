@@ -20,7 +20,9 @@ def main(argv):
     if args.gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
-    config.REMOVE_LMDB = args.remove_lmdb is not None
+    print("Remove {}".format(args.remove_lmdb))
+
+    config.REMOVE_LMDB = args.remove_lmdb
     config.DUMP_DIR = args.dump_dir
 
     network.run(args)

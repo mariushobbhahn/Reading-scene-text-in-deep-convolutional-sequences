@@ -42,7 +42,7 @@ def int_label_to_char(label):
         return chr(label + 97)
 
 
-def load_lmdb(named_df, reuse=config.REMOVE_LMDB):
+def load_lmdb(named_df):
     """
     Loads a LMDBDataFlow for the given named data set.
 
@@ -54,7 +54,7 @@ def load_lmdb(named_df, reuse=config.REMOVE_LMDB):
     mdb_file = os.path.join(config.DATA_DIR, named_df.get_name() + ".mdb")
 
     # remove old file to force recreation
-    if (not reuse) and os.path.exists(mdb_file):
+    if config.REMOVE_LMDB and os.path.exists(mdb_file):
         print("Remove lmdb")
         os.remove(mdb_file)
 
