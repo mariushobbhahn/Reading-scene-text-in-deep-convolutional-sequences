@@ -17,7 +17,7 @@ class IIIT5K(NamedDataFlow):
     def __init__(self, train_or_test, data_dir, name="IIIT5K"):
         self.train_or_test = train_or_test
         self.data_dir = data_dir
-        super(IIIT5K).__init__(name)
+        super(IIIT5K, self).__init__(name)
 
     def get_name(self):
         return self._name + "_" + self.train_or_test

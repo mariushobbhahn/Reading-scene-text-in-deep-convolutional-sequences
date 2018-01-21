@@ -77,21 +77,7 @@ def dump_helper(helper, output_dir=None, count=100, step=1):
         cv2.imwrite(file, img)
 
 
-class SubData(RNGDataFlow):
-    def __init__(self, data, count, start=0, step=8):
-        self.start = start
-        self.step = step
-        self.count = count
-        self.data = data
-        self.reset_state()
 
-    def get_data(self):
-        elem = itertools.islice(self.data.get_data(), self.start, self.start + self.count * self.step, self.step)
-        for img, label in elem:
-            yield [img, label]
-
-    def size(self):
-        return self.count
 
 def IIIT5K(train_or_test, char_data=False, shuffle=False):
     """

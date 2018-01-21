@@ -3,9 +3,8 @@
 #if (os.path.abspath(os.curdir).find('cnn') != -1):
 #    os.chdir('..')
 import config as cfg
-import os
-import argparse
 import tensorflow as tf
+import data.utils
 
 # Just import everything into current namespace
 from tensorpack import *
@@ -111,6 +110,10 @@ class Model(ModelDesc):
 def get_data():
     train = BatchData(dataset.IIIT5K('train', char_data=True), 128) #TODO change back to 128
     test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
+
+    if cfg.DUMP_DIR:
+        data.utils.dump_data(train, cfg.DUMP_DIR)
+
     return train, test
 
 
@@ -138,17 +141,6 @@ def get_config():
 
 
 def run():
-    print("start network: server={}".format(cfg.IS_SERVER))
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', help='comma separated list of GPU(s) to use.')
-    parser.add_argument('--load', help='load model')
-    args = parser.parse_args()
-    if args.gpu:
-        os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-
-
-
     # automatically setup the directory for logging
     logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
 

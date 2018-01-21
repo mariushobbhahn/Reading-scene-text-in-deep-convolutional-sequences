@@ -1,8 +1,10 @@
 import os.path
 import getpass
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-RES_DIR = os.path.abspath(os.path.relpath("../res", ROOT_DIR))
+
+ROOT_DIR = os.path.abspath(__file__)
+ROOT_DIR_NAME = os.path.dirname(ROOT_DIR)
+RES_DIR = os.path.abspath(os.path.relpath("../res", os.path.abspath(__file__)))
 
 
 __SERVER_DATA = os.path.abspath("/graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/")
@@ -16,5 +18,5 @@ DATA_DIR = __SERVER_DATA if IS_SERVER else __LOCAL_DATA
 TRAIN_LOG_DIR_NAME = "train_log/{}".format(getpass.getuser())
 TRAIN_LOG_DIR = os.path.join(__SERVER_DATA if IS_SERVER else ROOT_DIR, TRAIN_LOG_DIR_NAME)
 
-DUMP_DATABASES = False
+DUMP_DIR = None
 REMOVE_LMDB = False
