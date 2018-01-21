@@ -132,7 +132,7 @@ def get_config():
             #    dataset_test,   # the DataFlow instance used for validation
             #    ScalarStats(['cross_entropy_loss', 'accuracy'])),
         ],
-        steps_per_epoch=2,#TODO change back to steps_per_epoch
+        steps_per_epoch=steps_per_epoch,#TODO change back to steps_per_epoch
         max_epoch=1000,
     )
 
