@@ -10,7 +10,7 @@ import data.utils
 from tensorpack import *
 from tensorpack.tfutils import summary
 from tensorflow.python.platform import flags
-from data import dataset
+from data.iiit5k import *
 from cnn import maxgroup
 
 IMAGE_SIZE = 32
@@ -108,13 +108,15 @@ class Model(ModelDesc):
 
 
 def get_data():
-    train = BatchData(dataset.IIIT5K('train', char_data=True), 128) #TODO change back to 128
-    test = BatchData(dataset.IIIT5K('test', char_data=True), 256, remainder=True)
 
+    train = data.utils.load_lmdb(IIIT5KChar('train'))
+    test = data.utils.load_lmdb(IIIT5KChar('test'))
+
+    # check if train data should be dumped.
     if cfg.DUMP_DIR:
         data.utils.dump_data(train, cfg.DUMP_DIR)
 
-    return train, test
+    return BatchData(train, 128), BatchData(test, 256, remainder=True)
 
 
 def get_config():
@@ -140,12 +142,12 @@ def get_config():
     )
 
 
-def run():
+def run(args):
     # automatically setup the directory for logging
     logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
 
-
     config = get_config()
+
     if args.load:
         config.session_init = SaverRestore(args.load)
 

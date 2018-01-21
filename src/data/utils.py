@@ -54,13 +54,16 @@ def load_lmdb(named_df, reuse=config.REMOVE_LMDB):
     mdb_file = os.path.join(config.DATA_DIR, named_df.get_name() + ".mdb")
 
     # remove old file to force recreation
-    if not reuse:
+    if (not reuse) and os.path.exists(mdb_file):
+        print("Remove lmdb")
         os.remove(mdb_file)
 
     # check if mdb must be created
     if not os.path.exists(mdb_file):
+        print("Create lmdb...")
         df = MapData(named_df, lambda p: (convert_image_to_array(p[0]), p[1]))
         dump_dataflow_to_lmdb(df, mdb_file)
+        print("Done")
 
     # Load lmdb and convert data points to images
     ds = LMDBData(mdb_file)

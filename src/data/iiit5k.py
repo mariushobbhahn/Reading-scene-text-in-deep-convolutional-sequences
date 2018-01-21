@@ -1,6 +1,6 @@
 import os.path
 import scipy.io
-import cv2
+import config
 
 from data.utils import *
 from data.named_data import NamedDataFlow
@@ -14,7 +14,10 @@ class IIIT5K(NamedDataFlow):
 
     _cached_file = None
 
-    def __init__(self, train_or_test, data_dir, name="IIIT5K"):
+    def __init__(self, train_or_test, data_dir=None, name="IIIT5K"):
+        if data_dir is None:
+            data_dir = os.path.join(config.DATA_DIR, name)
+
         self.train_or_test = train_or_test
         self.data_dir = data_dir
         super(IIIT5K, self).__init__(name)

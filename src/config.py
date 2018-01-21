@@ -2,9 +2,8 @@ import os.path
 import getpass
 
 
-ROOT_DIR = os.path.abspath(__file__)
-ROOT_DIR_NAME = os.path.dirname(ROOT_DIR)
-RES_DIR = os.path.abspath(os.path.relpath("../res", os.path.abspath(__file__)))
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+RES_DIR = os.path.abspath(os.path.relpath("res", os.path.abspath(__file__)))
 
 
 __SERVER_DATA = os.path.abspath("/graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/")
