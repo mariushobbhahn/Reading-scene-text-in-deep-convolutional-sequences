@@ -6,7 +6,7 @@ import shutil
 
 from tensorpack.dataflow.dftools import *
 from tensorpack.dataflow import *
-from data.sub_data import SubData
+from data.dataset import SubData
 
 
 def char_to_int_label(char):

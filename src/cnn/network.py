@@ -32,9 +32,6 @@ class Model(ModelDesc):
         # inputs contains a list of input variables defined above
         image, label = inputs
 
-        #TODO schreibe bilder
-
-        label = tf.Print(label, [label])
 
         # In tensorflow, inputs to convolution function are assumed to be
         # NHWC. Add a single channel here.
@@ -44,7 +41,11 @@ class Model(ModelDesc):
 
         # The context manager `argscope` sets the default option for all the layers under
         # this context. Here we use convolution with shape 9x9
-        with argscope(Conv2D, padding='valid', kernel_shape=9, nl=tf.identity, W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
+        with argscope(Conv2D,
+                      padding='valid',
+                      kernel_shape=9,
+                      nl=tf.identity,
+                      W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
             logits = (LinearWrap(image).
                         Conv2D('conv0', out_channel=96).
                         maxgroup('max0', 2, 24, axis=3).
@@ -55,19 +56,13 @@ class Model(ModelDesc):
                         Conv2D('conv3', kernel_shape=8, out_channel=512).
                         maxgroup('max3', 4, 1, axis=3).
                         Conv2D('conv4', kernel_shape=1, out_channel=144).
-                        #TODO replace with FullyConnected?
                         maxgroup('max4', 4, 1, axis=3).
                         #TODO check if needed
-                        FullyConnected('fc', out_dim=36, nl=tf.nn.relu, b_init=tf.contrib.layers.variance_scaling_initializer(1.0))())
-                        #pruneaxis('prune', 36)())
-                        #FullyConnected('fc', out_dim=10, nl=tf.identity)())
-                        #Maxout('max4', num_unit=4))
+                        # FullyConnected('fc', out_dim=36, nl=tf.nn.relu, b_init=tf.contrib.layers.variance_scaling_initializer(1.0))())
+                        pruneaxis('prune', 36)())
 
 
 
-        #softmax = logits.Softmax('prob')
-        # TODO check
-        # tf.nn.softmax(logits, name='prob')   # a Bx10 with probabilities
 
         # logits = tf.Print(logits, [tf.nn.softmax(logits, name='sm')], summarize=360)
         # a vector of length B with loss of each sample
@@ -148,7 +143,6 @@ def get_config():
         callbacks=[
             ModelSaver(),   # save the model after every epoch
             MaxSaver('validation_accuracy'),  # save the model with highest accuracy (prefix 'validation_')
-            #TODO enable inference
             InferenceRunner(    # run inference(for validation) after every epoch
                 dataset_test,   # the DataFlow instance used for validation
                 ScalarStats(['cross_entropy_loss', 'accuracy'])),
@@ -169,4 +163,4 @@ def run(args):
 
     # SimpleTrainer is slow, this is just a demo.
     # You can use QueueInputTrainer instead
-    launch_train_with_config(config, SimpleTrainer())
+    launch_train_with_config(config, QueueInputTrainer())
