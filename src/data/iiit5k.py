@@ -21,6 +21,9 @@ class IIIT5K(NamedDataFlow):
         self.data_dir = data_dir
         super(IIIT5K, self).__init__(name)
 
+    def size(self):
+        return sum(1 for _ in self._get_mat_file())
+
     def get_name(self):
         return self._name + "_" + self.train_or_test
 

@@ -36,7 +36,7 @@ def main(argv):
 
     # start training
     train(unique=args.unique or False,
-          sub_data=args.sub_data,
+          sub_data=int(args.sub_data) if args.sub_data else None,
           batch_size=int(args.batch_size) if args.batch_size else 128)
 
 

@@ -58,6 +58,7 @@ class CNN:
                       nl=tf.identity,
                       W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
 
+            # output for RNN
             self.out_features = (LinearWrap(inputs).
                 Conv2D('conv0', out_channel=96).
                 maxgroup('max0', 2, 24, axis=3).
@@ -68,6 +69,7 @@ class CNN:
                 Conv2D('conv3', kernel_shape=8, out_channel=512).
                 maxgroup('max3', 4, 1, axis=3)())
 
+            # output for training
             self.out_labels = (LinearWrap(self.out_features).
                 Conv2D('conv4', kernel_shape=1, out_channel=144).
                 maxgroup('max4', 4, 1, axis=3).
