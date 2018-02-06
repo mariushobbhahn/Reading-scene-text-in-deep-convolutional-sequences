@@ -2,7 +2,7 @@ import os.path
 import scipy.io as sp
 
 from data.utils import *
-from data.named_data import NamedDataFlow
+from data.dataset import NamedDataFlow
 
 
 class IIIT5K(NamedDataFlow):

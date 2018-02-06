@@ -114,3 +114,24 @@ class PruneAxis(base.Layer):
     shape = gen_array_ops.shape(inputs)
     batchsize = shape[0]
     return gen_array_ops.reshape(inputs, [batchsize, self.out_channel])
+
+
+class ConvertLabel(base.Layer):
+  def call(self, inputs):
+    print("convert {}".format(inputs))
+    inputs = ops.convert_to_tensor(inputs)
+    shape = inputs.shape
+
+    if shape[self.axis] % self.num_units != 0:
+      raise ValueError('number of features({}) is not '
+                       'a multiple of group({})'
+                       .format(shape[self.axis], self.num_units))
+
+    out_channel = int(shape[self.axis].value / self.num_units)
+    # Dealing with batches with arbitrary sizes
+    batchsize = gen_array_ops.shape(inputs)[0]
+
+    pairing = gen_array_ops.reshape(inputs, [batchsize, self.size, self.size, out_channel, self.num_units])
+    outputs = math_ops.reduce_max(pairing, axis=self.axis + 1, keep_dims=False)
+
+    return outputs

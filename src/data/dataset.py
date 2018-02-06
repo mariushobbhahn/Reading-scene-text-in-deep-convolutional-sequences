@@ -31,6 +31,9 @@ class SubData(DataFlow):
         self.data = data
         self.reset_state()
 
+    def reset_state(self):
+        self.data.reset_state()
+
     def get_data(self):
         elem = itertools.islice(self.data.get_data(), self.start, self.start + self.count * self.step, self.step)
         for img, label in elem:
@@ -49,6 +52,8 @@ class UniqueData(DataFlow):
         # Count will be init lazy
         self.count = None
 
+    def reset_state(self):
+        self.data.reset_state()
 
     def get_data(self):
         """
