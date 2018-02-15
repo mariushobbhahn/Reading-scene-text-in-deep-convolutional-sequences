@@ -158,9 +158,7 @@ def train(unique=False, sub_data=None, batch_size=None):
                     sub_data=sub_data,
                     batch_size=batch_size)
 
-    c = get_config(data)
+    c = get_config(data, run_inference=False)
 
     #TODO change trainer
     launch_train_with_config(c, SimpleTrainer())
-
-

@@ -30,7 +30,7 @@ from tensorflow.python.layers import base
 from tensorpack.models.common import layer_register
 
 @layer_register(log_shape=True)
-def maxgroup(inputs, group, image_size, axis=3, name=None):
+def maxgroup(inputs, group, axis=3, name=None):
     """Adds a maxgroup op
     "
      Arguments:
@@ -44,11 +44,11 @@ def maxgroup(inputs, group, image_size, axis=3, name=None):
      Raises:
       ValueError: if num_units is not multiple of number of features.
     """
-    return _MaxGroup(image_size=image_size, axis=axis, group=group, name=name)(inputs)
+    return _MaxGroup(axis=axis, group=group, name=name)(inputs)
 
 
-def MaxGroup(inputs, group, image_size, axis=3, name=None):
-    return _MaxGroup(image_size=image_size, axis=axis, group=group, name=name).apply(inputs, scope=get_variable_scope())
+def MaxGroup(inputs, group, axis=3, name=None):
+    return _MaxGroup(axis=axis, group=group, name=name).apply(inputs, scope=get_variable_scope())
 
 
 
@@ -72,13 +72,11 @@ class _MaxGroup(base.Layer):
     def __init__(self,
                  group=2,
                  axis=3,
-                 image_size=24,
                  name=None,
                  **kwargs):
         super(_MaxGroup, self).__init__(
             name=name, trainable=False, **kwargs)
         self.num_units = group
-        self.size = image_size
         self.axis = axis
 
 
@@ -93,10 +91,13 @@ class _MaxGroup(base.Layer):
 
         out_channel = int(shape[self.axis].value / self.num_units)
         # Dealing with batches with arbitrary sizes
-        batchsize = gen_array_ops.shape(inputs)[0]
+        shape = gen_array_ops.shape(inputs)
+        batchsize = shape[0]
+        size = shape[1]
 
-        pairing = gen_array_ops.reshape(inputs, [batchsize, self.size, self.size, out_channel, self.num_units])
-        outputs = math_ops.reduce_max(pairing, axis=self.axis+1, keepdims=False)
+
+        pairing = gen_array_ops.reshape(inputs, [batchsize, size, size, out_channel, self.num_units])
+        outputs = math_ops.reduce_max(pairing, axis=self.axis+1, keep_dims=False)
 
         return outputs
 
