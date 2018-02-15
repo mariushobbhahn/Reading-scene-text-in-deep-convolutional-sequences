@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from tensorflow import get_variable_scope
 from tensorflow.python.eager import context
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import math_ops
@@ -43,7 +44,7 @@ def maxgroup(inputs, group, IMAGE_SIZE, axis=3, name=None):
    Raises:
     ValueError: if num_units is not multiple of number of features.
   """
-  return MaxGroup(IMAGE_SIZE=IMAGE_SIZE, axis=axis, group=group, name=name)(inputs)
+  return MaxGroup(IMAGE_SIZE=IMAGE_SIZE, axis=axis, group=group, name=name).apply(inputs, scope=get_variable_scope())
 
 
 class MaxGroup(base.Layer):
@@ -96,24 +97,24 @@ class MaxGroup(base.Layer):
 
 
 @layer_register(log_shape=True)
-def pruneaxis(inputs, out_channel, name=None):
+def pruneaxis(inputs, name=None):
   """
   prunes axis 1 and two. only call this if inputs.shape[1] == 1 == inputs.shape[2]
   input: Tensor of shape [batchsize, 1, 1, x]
   output: Tensor of shape [batchsize, x]
   """
-  return PruneAxis(out_channel, name=name)(inputs)
+  return PruneAxis(name=name)(inputs)
 
 class PruneAxis(base.Layer):
-  def __init__(self, out_channel, name=None, **kwargs):
+  def __init__(self, name=None, **kwargs):
     super(PruneAxis, self).__init__(name=name, trainable=False, **kwargs)
-    self.out_channel = out_channel
 
   def call(self, inputs):
     inputs = ops.convert_to_tensor(inputs)
     shape = gen_array_ops.shape(inputs)
     batchsize = shape[0]
-    return gen_array_ops.reshape(inputs, [batchsize, self.out_channel])
+    out_channel = shape[3]
+    return gen_array_ops.reshape(inputs, [batchsize, out_channel])
 
 
 class ConvertLabel(base.Layer):

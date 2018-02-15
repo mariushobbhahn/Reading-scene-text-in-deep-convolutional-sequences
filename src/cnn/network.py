@@ -46,7 +46,7 @@ def build_cnn(inputs):
                   .maxgroup('max3', 4, 1, axis=3)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', 4, 1, axis=3)
-                  .pruneaxis('prune', 36)
+                  .pruneaxis('prune')
                   # .FullyConnected('fc', out_dim=36, nl=FC_NL,
                   #                 b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
                   ())
@@ -82,7 +82,7 @@ def _tower_func(inputs):
                   .maxgroup('max3', 4, 1, axis=3)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', 4, 1, axis=3)
-                  .pruneaxis('prune', 36)
+                  .pruneaxis('prune')
                   # .FullyConnected('fc', out_dim=36, nl=FC_NL,
                   #                 b_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE))
                   ())
