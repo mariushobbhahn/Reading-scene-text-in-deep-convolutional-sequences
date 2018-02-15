@@ -17,6 +17,11 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
+WEIGHT_INIT_VARIANCE = 0.0001
+BIAS_INIT_VARIANCE = 1.0
+
+DEFAULT_NL = tf.nn.relu
+FC_NL = tf.nn.relu
 
 def build_cnn(inputs):
     # In tensorflow, inputs to convolution function are assumed to be
@@ -93,18 +98,19 @@ def build_cnn(inputs):
     with argscope(Conv2D,
                   padding='valid',
                   kernel_shape=9,
-                  nl=tf.identity):
+                  nl=DEFAULT_NL,
+                  W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
-                  .maxgroup('max0', group=2)
+                  .maxgroup('max0', size=24, group=2)
                   .Conv2D('conv1', out_channel=128)
-                  .maxgroup('max1', group=2)
+                  .maxgroup('max1', size=16, group=2)
                   .Conv2D('conv2', out_channel=256)
-                  .maxgroup('max2', group=2)
+                  .maxgroup('max2', size=8, group=2)
                   .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .maxgroup('max3', group=4)
+                  .maxgroup('max3', size=1, group=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
-                  .maxgroup('max4', group=4)
+                  .maxgroup('max4', size=1, group=4)
                   .pruneaxis('prune')
                   # .FullyConnected('fc', out_dim=36, nl=FC_NL,
                   #                 b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))

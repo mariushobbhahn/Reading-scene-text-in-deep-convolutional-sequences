@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from tensorflow import Print as tfp
 from tensorflow import get_variable_scope
 from tensorflow.python.eager import context
 from tensorflow.python.framework import ops
@@ -30,7 +31,7 @@ from tensorflow.python.layers import base
 from tensorpack.models.common import layer_register
 
 @layer_register(log_shape=True)
-def maxgroup(inputs, group, axis=3, name=None):
+def maxgroup(inputs, size, group, axis=3, name=None):
     """Adds a maxgroup op
     "
      Arguments:
@@ -44,11 +45,11 @@ def maxgroup(inputs, group, axis=3, name=None):
      Raises:
       ValueError: if num_units is not multiple of number of features.
     """
-    return _MaxGroup(axis=axis, group=group, name=name)(inputs)
+    return _MaxGroup(size, axis=axis, group=group, name=name)(inputs)
 
 
-def MaxGroup(inputs, group, axis=3, name=None):
-    return _MaxGroup(axis=axis, group=group, name=name).apply(inputs, scope=get_variable_scope())
+def MaxGroup(inputs, size, group, axis=3, name=None):
+    return _MaxGroup(size, axis=axis, group=group, name=name).apply(inputs, scope=get_variable_scope())
 
 
 
@@ -70,6 +71,7 @@ class _MaxGroup(base.Layer):
     """
 
     def __init__(self,
+                 size,
                  group=2,
                  axis=3,
                  name=None,
@@ -78,6 +80,7 @@ class _MaxGroup(base.Layer):
             name=name, trainable=False, **kwargs)
         self.num_units = group
         self.axis = axis
+        self.size = size
 
 
     def call(self, inputs):
@@ -93,10 +96,8 @@ class _MaxGroup(base.Layer):
         # Dealing with batches with arbitrary sizes
         shape = gen_array_ops.shape(inputs)
         batchsize = shape[0]
-        size = shape[1]
 
-
-        pairing = gen_array_ops.reshape(inputs, [batchsize, size, size, out_channel, self.num_units])
+        pairing = gen_array_ops.reshape(inputs, [batchsize, self.size, self.size, out_channel, self.num_units])
         outputs = math_ops.reduce_max(pairing, axis=self.axis+1, keep_dims=False)
 
         return outputs
