@@ -77,7 +77,7 @@ class TrainCNNModel(ModelDesc):
         lr = tf.train.exponential_decay(
             learning_rate=1e-3,
             global_step=get_global_step_var(),
-            decay_steps=10 * self.steps_per_epoch  ,  # 74 * 5,
+            decay_steps=self.steps_per_epoch,  # 74 * 5,
             decay_rate=self.lr_decay_rate, staircase=True, name='learning_rate')
         # This will also put the summary in tensorboard, stat.json and print in terminal
         # but this time without moving average

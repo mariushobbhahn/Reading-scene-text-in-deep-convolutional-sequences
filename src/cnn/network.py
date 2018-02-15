@@ -39,11 +39,11 @@ def build_cnn(inputs):
                   .Conv2D('conv3', kernel_shape=8, out_channel=512)
                   .Maxout('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
-                  .Maxout('max4', num_unit=4)())
-
-        logits = tf.reshape(tensor=logits,
-                            shape=[-1, 36],
-                            name='reshape')
+                  .maxgroup('max4', 4, 1, axis=3)
+                  .pruneaxis('prune')
+                  # .FullyConnected('fc', out_dim=36, nl=FC_NL,
+                  #                 b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
+                  ())
 
     return logits
 
