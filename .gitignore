@@ -2,8 +2,7 @@
 .secret
 
 # ignore data
-res/data/
-res/cnn_model/
+res/
 
 # ignore logs
 src/train_log/

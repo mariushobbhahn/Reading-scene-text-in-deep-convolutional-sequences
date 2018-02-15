@@ -9,12 +9,10 @@ from tensorpack import *
 from tensorpack.tfutils import summary
 from tensorflow.python.platform import flags
 
-from cnn.maxgroup import MaxGroup, maxgroup
 from tensorpack.predict import OfflinePredictor, PredictConfig
 from utils.window import SlidingWindow
 from data.utils import int_label_to_char
 
-from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
 
@@ -24,76 +22,13 @@ def build_cnn(inputs):
     inputs = tf.expand_dims(inputs, 3)
     inputs = inputs * 2 - 1  # center the pixels values at zero
 
-    # activation = tf.identity
-    #
-    # logits = tf.layers.conv2d(inputs=inputs,
-    #                           filters=96,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv0')
-    #
-    # logits = Maxout(num_units=48, name='max0').apply(logits)
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=128,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv1')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=64,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=256,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv2')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=128,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=512,
-    #                           kernel_size=[8, 8],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv3')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=128,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=144,
-    #                           kernel_size=[1, 1],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv4')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=36,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.reshape(tensor=logits,
-    #                     shape=[1, 36],
-    #                     name='prune')
-
     # The context manager `argscope` sets the default option for all the layers under
     # this context. Here we use convolution with shape 9x9
     with argscope(Conv2D,
                   padding='valid',
                   kernel_shape=9,
-                  nl=tf.identity):
+                  nl=tf.identity,
+                  W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
                   .Maxout('max0', num_unit=2)

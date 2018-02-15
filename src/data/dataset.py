@@ -57,6 +57,7 @@ class UniqueData(DataFlow):
         self.data = data
         # Count will be init lazy
         self.count = None
+        self.reset_state()
 
     def reset_state(self):
         self.data.reset_state()

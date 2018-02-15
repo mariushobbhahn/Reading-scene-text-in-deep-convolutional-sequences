@@ -11,7 +11,6 @@ from tensorflow.python.platform import flags
 from data.iiit5k import IIIT5KChar
 from data.dataset import *
 from cnn.network import build_cnn
-from cnn.maxgroup import *
 
 class TrainCNNModel(ModelDesc):
 
@@ -37,9 +36,9 @@ class TrainCNNModel(ModelDesc):
 
         # print the predicted labels for the first data point in each step.
         logits = tf.Print(logits,
-                          # [tf.argmax(logits, dimension=1, name='prediction')],
-                          [tf.nn.softmax(logits, name='sm')],
-                          summarize=72,
+                          [tf.argmax(logits, dimension=1, name='prediction')],
+                          # [tf.nn.softmax(logits, name='sm')],
+                          summarize=2,
                           message="pred: ")
 
         label = tf.Print(label,
@@ -111,8 +110,8 @@ def get_data(unique=False, sub_data=None, batch_size=128):
 
     return ds_train, ds_test
 
-
-def get_config(data, max_epoch=100, lr_decay_rate=0.98, run_inference=True):
+# TODO Enable Maxout
+def get_config(data, max_epoch=200, lr_decay_rate=0.98, run_inference=False):
     dataset_train, dataset_test = data
 
     # How many iterations you want in each epoch.
