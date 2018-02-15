@@ -15,6 +15,12 @@ from utils.window import SlidingWindow
 from data.utils import int_label_to_char
 from data.utils import convert_image_to_array
 
+WEIGHT_INIT_VARIANCE = 0.001
+BIAS_INIT_VARIANCE = 1.0
+
+DEFAULT_NL = tf.identity
+FC_NL = tf.nn.relu
+
 
 def build_cnn(inputs):
     # In tensorflow, inputs to convolution function are assumed to be
@@ -27,8 +33,8 @@ def build_cnn(inputs):
     with argscope(Conv2D,
                   padding='valid',
                   kernel_shape=9,
-                  nl=tf.nn.relu,
-                  W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
+                  nl=DEFAULT_NL,
+                  W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
                   .maxgroup('max0', 2, 24, axis=3)
@@ -40,8 +46,10 @@ def build_cnn(inputs):
                   .maxgroup('max3', 4, 1, axis=3)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', 4, 1, axis=3)
-                  .FullyConnected('fc', out_dim=36, nl=tf.nn.relu,
-                                  b_init=tf.contrib.layers.variance_scaling_initializer(1.0))())
+                  .pruneaxis(36)
+                  # .FullyConnected('fc', out_dim=36, nl=FC_NL,
+                  #                 b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
+                  ())
 
     return logits
 
@@ -61,8 +69,8 @@ def _tower_func(inputs):
     with argscope(Conv2D,
                   padding='valid',
                   kernel_shape=9,
-                  nl=tf.nn.relu,
-                  W_init=tf.contrib.layers.variance_scaling_initializer(0.001)):
+                  nl=DEFAULT_NL,
+                  W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
                   .maxgroup('max0', 2, 24, axis=3)
@@ -74,9 +82,12 @@ def _tower_func(inputs):
                   .maxgroup('max3', 4, 1, axis=3)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', 4, 1, axis=3)
-                  .FullyConnected('fc', out_dim=36, nl=tf.nn.relu,
-                                  b_init=tf.contrib.layers.variance_scaling_initializer(1.0))())
+                  .pruneaxis(36)
+                  # .FullyConnected('fc', out_dim=36, nl=FC_NL,
+                  #                 b_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE))
+                  ())
 
+    logits = tf.Print(logits, [logits], summarize=36)
     #tf.identity(logits, name='labels')
     tf.nn.softmax(logits, name='labels')
 
@@ -133,7 +144,7 @@ class CharacterPredictor(OfflinePredictor):
 
         window = SlidingWindow(step_size)
 
-        for slide in reversed(list(window.slides(image))):
+        for slide in window.slides(image):
             slide = slide.reshape((1,  32, 32))
 
             yield self(slide)[0][output]

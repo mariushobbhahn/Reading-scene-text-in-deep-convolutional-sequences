@@ -85,6 +85,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     if unique:
         print("Use one data point per label")
         ds_train = UniqueData(ds_train)
+        ds_test = UniqueData(ds_test)
 
     if sub_data:
         print("Uses only {} data points".format(sub_data))
@@ -135,7 +136,8 @@ def get_config(data, max_epoch=1000, lr_decay_rate=0.98, run_inference=True):
         dataflow=dataset_train,  # the DataFlow instance for training
         callbacks=callbacks,
         steps_per_epoch=steps_per_epoch,
-        max_epoch=max_epoch
+        max_epoch=max_epoch,
+#        session_init=SaverRestore('train_log/jan0121-200909/checkpoint')
     )
 
 
@@ -153,5 +155,3 @@ def train(unique=False, sub_data=None, batch_size=None):
 
     #TODO change trainer
     launch_train_with_config(c, SimpleTrainer())
-
-
