@@ -1,6 +1,7 @@
 import config as cfg
 import tensorflow as tf
 import data.utils
+import os
 
 # Just import everything into current namespace
 from tensorpack import *
@@ -15,7 +16,7 @@ from cnn.maxgroup import *
 class TrainCNNModel(ModelDesc):
 
     def __init__(self, image_size=32):
-        self.image_size = image_size
+        self.image_size = int(image_size)
 
     def _get_inputs(self):
         """
@@ -35,8 +36,16 @@ class TrainCNNModel(ModelDesc):
         logits = build_cnn(image)
 
         # print the predicted labels for the first data point in each step.
-        logits = tf.Print(logits, [tf.nn.softmax(logits, name='sm')], summarize=36)
-        label = tf.Print(label, [label], summarize=1)
+        logits = tf.Print(logits,
+                          # [tf.argmax(logits, dimension=1, name='prediction')],
+                          [tf.nn.softmax(logits, name='sm')],
+                          summarize=72,
+                          message="pred: ")
+
+        label = tf.Print(label,
+                         [label],
+                         summarize=2,
+                         message="labels: ")
 
         # a vector of length B with loss of each sample
         cost = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=label)
@@ -62,7 +71,7 @@ class TrainCNNModel(ModelDesc):
 
 
         # monitor histogram of all weight (of conv and fc layers) in tensorboard
-        summary.add_param_summary(('.*/W', ['histogram', 'rms']))
+        # summary.add_param_summary(('.*/W', ['histogram', 'rms']))
 
     def _get_optimizer(self):
         # decay every x epoches by lr_decay_rate
@@ -85,7 +94,6 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     if unique:
         print("Use one data point per label")
         ds_train = UniqueData(ds_train)
-        ds_test = UniqueData(ds_test)
 
     if sub_data:
         print("Uses only {} data points".format(sub_data))
@@ -104,13 +112,12 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     return ds_train, ds_test
 
 
-def get_config(data, max_epoch=1000, lr_decay_rate=0.98, run_inference=True):
+def get_config(data, max_epoch=100, lr_decay_rate=0.98, run_inference=True):
     dataset_train, dataset_test = data
 
     # How many iterations you want in each epoch.
     # This is the default value, don't actually need to set it in the config
     steps_per_epoch = dataset_train.size()
-    # steps_per_epoch = 2 #TODO: remove this for actual training
 
     model = TrainCNNModel()
     model.steps_per_epoch = steps_per_epoch
@@ -137,7 +144,7 @@ def get_config(data, max_epoch=1000, lr_decay_rate=0.98, run_inference=True):
         callbacks=callbacks,
         steps_per_epoch=steps_per_epoch,
         max_epoch=max_epoch,
-#        session_init=SaverRestore('train_log/jan0121-200909/checkpoint')
+        # session_init=SaverRestore(os.path.join(cfg.RES_DIR, 'model/schulte/max-validation_accuracy'))
     )
 
 
@@ -155,3 +162,5 @@ def train(unique=False, sub_data=None, batch_size=None):
 
     #TODO change trainer
     launch_train_with_config(c, SimpleTrainer())
+
+

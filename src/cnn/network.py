@@ -9,17 +9,13 @@ from tensorpack import *
 from tensorpack.tfutils import summary
 from tensorflow.python.platform import flags
 
-from cnn import maxgroup
+from cnn.maxgroup import MaxGroup, maxgroup
 from tensorpack.predict import OfflinePredictor, PredictConfig
 from utils.window import SlidingWindow
 from data.utils import int_label_to_char
+
+from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
-
-WEIGHT_INIT_VARIANCE = 0.001
-BIAS_INIT_VARIANCE = 1.0
-
-DEFAULT_NL = tf.identity
-FC_NL = tf.nn.relu
 
 
 def build_cnn(inputs):
@@ -28,22 +24,85 @@ def build_cnn(inputs):
     inputs = tf.expand_dims(inputs, 3)
     inputs = inputs * 2 - 1  # center the pixels values at zero
 
+    # activation = tf.identity
+    #
+    # logits = tf.layers.conv2d(inputs=inputs,
+    #                           filters=96,
+    #                           kernel_size=[9, 9],
+    #                           padding='valid',
+    #                           activation=activation,
+    #                           name='conv0')
+    #
+    # logits = Maxout(num_units=48, name='max0').apply(logits)
+    #
+    # logits = tf.layers.conv2d(inputs=logits,
+    #                           filters=128,
+    #                           kernel_size=[9, 9],
+    #                           padding='valid',
+    #                           activation=activation,
+    #                           name='conv1')
+    #
+    # logits = tf.contrib.layers.maxout(inputs=logits,
+    #                           num_units=64,
+    #                           axis=3,
+    #                           name='max1')
+    #
+    #
+    # logits = tf.layers.conv2d(inputs=logits,
+    #                           filters=256,
+    #                           kernel_size=[9, 9],
+    #                           padding='valid',
+    #                           activation=activation,
+    #                           name='conv2')
+    #
+    # logits = tf.contrib.layers.maxout(inputs=logits,
+    #                           num_units=128,
+    #                           axis=3,
+    #                           name='max1')
+    #
+    # logits = tf.layers.conv2d(inputs=logits,
+    #                           filters=512,
+    #                           kernel_size=[8, 8],
+    #                           padding='valid',
+    #                           activation=activation,
+    #                           name='conv3')
+    #
+    # logits = tf.contrib.layers.maxout(inputs=logits,
+    #                           num_units=128,
+    #                           axis=3,
+    #                           name='max1')
+    #
+    # logits = tf.layers.conv2d(inputs=logits,
+    #                           filters=144,
+    #                           kernel_size=[1, 1],
+    #                           padding='valid',
+    #                           activation=activation,
+    #                           name='conv4')
+    #
+    # logits = tf.contrib.layers.maxout(inputs=logits,
+    #                           num_units=36,
+    #                           axis=3,
+    #                           name='max1')
+    #
+    # logits = tf.reshape(tensor=logits,
+    #                     shape=[1, 36],
+    #                     name='prune')
+
     # The context manager `argscope` sets the default option for all the layers under
     # this context. Here we use convolution with shape 9x9
     with argscope(Conv2D,
                   padding='valid',
                   kernel_shape=9,
-                  nl=DEFAULT_NL,
-                  W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
+                  nl=tf.identity):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
-                  .maxgroup('max0', 2, 24, axis=3)
+                  .Maxout('max0', num_unit=2)
                   .Conv2D('conv1', out_channel=128)
-                  .maxgroup('max1', 2, 16, axis=3)
+                  .Maxout('max1', num_unit=2)
                   .Conv2D('conv2', out_channel=256)
-                  .maxgroup('max2', 2, 8, axis=3)
+                  .Maxout('max2', num_unit=2)
                   .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .maxgroup('max3', 4, 1, axis=3)
+                  .Maxout('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', 4, 1, axis=3)
                   .pruneaxis('prune')
@@ -59,40 +118,9 @@ def _tower_func(inputs):
     Tower func for the predictor. Builds the default cnn graph and adds a softmax to the end.
     :param input: The input tensor
     """
-    # In tensorflow, inputs to convolution function are assumed to be
-    # NHWC. Add a single channel here.
-    inputs = tf.expand_dims(inputs, 3)
-    inputs = inputs * 2 - 1  # center the pixels values at zero
 
-    # The context manager `argscope` sets the default option for all the layers under
-    # this context. Here we use convolution with shape 9x9
-    with argscope(Conv2D,
-                  padding='valid',
-                  kernel_shape=9,
-                  nl=DEFAULT_NL,
-                  W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
-        logits = (LinearWrap(inputs)
-                  .Conv2D('conv0', out_channel=96)
-                  .maxgroup('max0', 2, 24, axis=3)
-                  .Conv2D('conv1', out_channel=128)
-                  .maxgroup('max1', 2, 16, axis=3)
-                  .Conv2D('conv2', out_channel=256)
-                  .maxgroup('max2', 2, 8, axis=3)
-                  .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .maxgroup('max3', 4, 1, axis=3)
-                  .Conv2D('conv4', kernel_shape=1, out_channel=144)
-                  .maxgroup('max4', 4, 1, axis=3)
-                  .pruneaxis('prune')
-                  # .FullyConnected('fc', out_dim=36, nl=FC_NL,
-                  #                 b_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE))
-                  ())
-
-    logits = tf.Print(logits, [logits], summarize=36)
-    #tf.identity(logits, name='labels')
-    tf.nn.softmax(logits, name='labels')
-
-    # logits = build_cnn(input)
-    # logits = tf.identity(logits, name='labels')
+    logits = build_cnn(inputs)
+    logits = tf.identity(logits, name='labels')
     # tf.nn.softmax(logits, name='labels')
 
 
@@ -105,7 +133,6 @@ def _map_prediction(p):
     """
     max_index = 0
     max_value = p[0]
-    threshold = 0.5
 
     for i in range(1, len(p)):
         value = p[i]
@@ -128,7 +155,7 @@ class CharacterPredictor(OfflinePredictor):
             session_init=SaverRestore(model),
             input_names=['input'],
             # TODO cannot choose max3. Fix this
-            output_names=['labels'])
+            output_names=['max3/output', 'labels'])
 
         super(CharacterPredictor, self).__init__(config)
 
@@ -145,10 +172,9 @@ class CharacterPredictor(OfflinePredictor):
         window = SlidingWindow(step_size)
 
         for slide in window.slides(image):
-            slide = slide.reshape((1,  32, 32))
+            slide = slide.reshape((1,  32, 32)).astype('float32')
 
-            yield self(slide)[0][output]
-
+            yield self(slide)[output][0]
 
     def predict_features(self, image, step_size=16):
         """
@@ -171,5 +197,5 @@ class CharacterPredictor(OfflinePredictor):
         :yield: The 36D prediciton vector or the character label predicted in the current step.
         """
         # TODO choose output 1 if tensor is fixed
-        for p in self._predict(image, step_size, 0):
+        for p in self._predict(image, step_size, 1):
             yield _map_prediction(p) if map_to_char else p

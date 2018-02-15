@@ -65,7 +65,7 @@ def load_lmdb(named_df):
         print("Done")
 
     # Load lmdb and convert data points to images
-    ds = LMDBData(mdb_file, shuffle=False)
+    ds = LMDBData(mdb_file, shuffle=True)
     ds = LMDBDataPoint(ds)
     ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
 
