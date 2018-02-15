@@ -9,7 +9,7 @@ from tensorflow.python.platform import flags
 
 from data.iiit5k import IIIT5KChar
 from data.dataset import *
-from cnn.network import CNN
+from cnn.network import build_cnn
 from cnn.maxgroup import *
 
 class TrainCNNModel(ModelDesc):
@@ -32,13 +32,7 @@ class TrainCNNModel(ModelDesc):
         # inputs contains a list of input variables defined above
         image, label = inputs
 
-        # In tensorflow, inputs to convolution function are assumed to be
-        # NHWC. Add a single channel here.
-        image = tf.expand_dims(image, 3)
-        image = image * 2 - 1   # center the pixels values at zero
-
-        cnn = CNN(image)
-        logits = cnn.out_labels
+        logits = build_cnn(image)
 
         # print the predicted labels for the first data point in each step.
         logits = tf.Print(logits, [tf.nn.softmax(logits, name='sm')], summarize=36)
@@ -98,6 +92,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
 
     # check if train data should be dumped.
     if cfg.DUMP_DIR:
+        print("dump data")
         data.utils.dump_data(ds_train, cfg.DUMP_DIR)
 
     # Batch data

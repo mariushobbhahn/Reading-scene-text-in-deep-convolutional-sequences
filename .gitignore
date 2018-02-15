@@ -3,6 +3,7 @@
 
 # ignore data
 res/data/
+res/cnn_model/
 
 # ignore logs
 src/train_log/

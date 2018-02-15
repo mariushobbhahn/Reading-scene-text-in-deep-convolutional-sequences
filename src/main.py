@@ -3,7 +3,9 @@ import sys
 import argparse
 import config
 
+
 from cnn.train import train
+from cnn.test import test
 
 
 def main(argv):
@@ -32,12 +34,16 @@ def main(argv):
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
     config.REMOVE_LMDB = args.remove_lmdb
-    config.DUMP_DIR = os.path.relpath('../dump/', config.DATA_DIR) if args.dump else None
+    config.DUMP_DIR = os.path.join(config.RES_DIR, 'dump') if args.dump else None
 
-    # start training
-    train(unique=args.unique or False,
-          sub_data=int(args.sub_data) if args.sub_data else None,
-          batch_size=int(args.batch_size) if args.batch_size else 128)
+    if args.test:
+        model = args.load or os.path.join(config.RES_DIR, 'model/schulte/checkpoint')
+        test(args.test, model)
+    else:
+        # start training
+        train(unique=args.unique or False,
+            sub_data=int(args.sub_data) if args.sub_data else None,
+            batch_size=int(args.batch_size) if args.batch_size else 128)
 
 
 if __name__ == "__main__":

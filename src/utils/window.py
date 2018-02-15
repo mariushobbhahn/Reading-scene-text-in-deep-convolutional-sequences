@@ -1,4 +1,5 @@
 import cv2
+import math
 
 
 class SlidingWindow:
@@ -19,11 +20,21 @@ class SlidingWindow:
         w = img_w - img_h
         steps = float(w) / float(self.step_size)
 
-        return int(steps)
+        return int(math.ceil(steps) + 1)
 
     def slides(self, image):
-        (h, ) = image.shape
+        (h, w) = image.shape
+
+        print("Image size: {}x{}  Slides: {}".format(w, h, self.number_of_slides(image)))
 
         for i in range(0, self.number_of_slides(image)):
             x = i * self.step_size
-            yield image[0:, x:h]
+
+            x = max(0, min(x, w - h))
+            img = image[0:, x:(x + h)]
+
+            print("Move sliding window to {}, got {}".format(x, img.shape))
+
+            yield img
+
+
