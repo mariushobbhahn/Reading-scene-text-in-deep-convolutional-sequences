@@ -66,9 +66,12 @@ class UniqueData(DataFlow):
             yields one data point per label.
         """
         known_labels = set()
+        index = 0
+        lastindex = -10
 
         for img, label in self.data.get_data():
-            if label not in known_labels:
+            index = index + 1
+            if label not in known_labels and index > lastindex + 6:
                 known_labels.add(label)
                 yield [img, label]
 
@@ -78,4 +81,3 @@ class UniqueData(DataFlow):
             self.count = sum(1 for _ in self.get_data())
 
         return self.count
-
