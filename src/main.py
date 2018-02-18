@@ -37,7 +37,7 @@ def main(argv):
     config.DUMP_DIR = os.path.join(config.RES_DIR, 'dump') if args.dump else None
 
     if args.test:
-        model = args.load or os.path.join(config.RES_DIR, '../src/train_log/jan0215-171627/checkpoint')
+        model = args.load or os.path.join(config.RES_DIR, 'train_log/jan0218-211855/checkpoint')
         test(args.test, model)
     else:
         # start training

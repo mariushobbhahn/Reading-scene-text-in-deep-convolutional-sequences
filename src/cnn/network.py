@@ -3,6 +3,7 @@
 
 import tensorflow as tf
 import cv2
+import numpy as np
 
 # Just import everything into current namespace
 from tensorpack import *
@@ -17,10 +18,10 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 0.0001
+WEIGHT_INIT_VARIANCE = 0.001
 BIAS_INIT_VARIANCE = 1.0
 
-DEFAULT_NL = tf.nn.relu
+DEFAULT_NL = tf.identity
 FC_NL = tf.nn.relu
 
 def build_cnn(inputs):
@@ -111,12 +112,12 @@ def build_cnn(inputs):
                   .maxgroup('max3', size=1, group=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .maxgroup('max4', size=1, group=4)
-                  .pruneaxis('prune')
-                  # .FullyConnected('fc', out_dim=36, nl=FC_NL,
-                  #                 b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
+                  #.pruneaxis('prune')
+                  .FullyConnected('fc', out_dim=36, nl=FC_NL,
+                                  b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
                   ())
-
-    return logits
+        logits = tf.Print(logits, [logits], summarize=36)
+        return logits
 
 
 def _tower_func(inputs):
@@ -126,6 +127,7 @@ def _tower_func(inputs):
     """
 
     logits = build_cnn(inputs)
+    # logits = tf.Print(logits, [logits], summarize=36)
     logits = tf.identity(logits, name='labels')
     # tf.nn.softmax(logits, name='labels')
 
@@ -137,15 +139,7 @@ def _map_prediction(p):
     :param p: The 36D vector with the prediction values.
     :return: A character from A to Z or 0 to 9.
     """
-    max_index = 0
-    max_value = p[0]
-
-    for i in range(1, len(p)):
-        value = p[i]
-
-        if value > max_value:
-            max_value = value
-            max_index = i
+    max_index = np.argmax(p)
 
     return "{} ({}%)".format(int_label_to_char(max_index), int(max_value * 100))
 
@@ -161,7 +155,8 @@ class CharacterPredictor(OfflinePredictor):
             session_init=SaverRestore(model),
             input_names=['input'],
             # TODO cannot choose max3. Fix this
-            output_names=['max3/output', 'labels'])
+            output_names=['fc/output'])
+            # output_names=['max3/output', 'labels'])
 
         super(CharacterPredictor, self).__init__(config)
 
@@ -179,7 +174,7 @@ class CharacterPredictor(OfflinePredictor):
 
         for slide in window.slides(image):
             slide = slide.reshape((1,  32, 32)).astype('float32')
-
+            print(self(slide))
             yield self(slide)[output][0]
 
     def predict_features(self, image, step_size=16):
@@ -203,5 +198,5 @@ class CharacterPredictor(OfflinePredictor):
         :yield: The 36D prediciton vector or the character label predicted in the current step.
         """
         # TODO choose output 1 if tensor is fixed
-        for p in self._predict(image, step_size, 1):
+        for p in self._predict(image, step_size, 0):
             yield _map_prediction(p) if map_to_char else p
