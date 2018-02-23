@@ -66,6 +66,7 @@ class UniqueData(DataFlow):
         """
             yields one data point per label.
         """
+        self.reset_state()
         known_labels = set()
         index = 0
         lastindex = -10

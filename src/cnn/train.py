@@ -37,14 +37,14 @@ class TrainCNNModel(ModelDesc):
 
         # print the predicted labels for the first data point in each step.
         logits = tf.Print(logits,
-                          # [tf.argmax(logits, dimension=1, name='prediction')],
-                          [tf.nn.softmax(logits, name='sm')],
-                          summarize=72,
+                          [tf.argmax(logits, dimension=1, name='prediction')],
+                          # [tf.nn.softmax(logits, name='sm')],
+                          summarize=4,
                           message="pred: ")
 
         label = tf.Print(label,
                          [label],
-                         summarize=2,
+                         summarize=4,
                          message="labels: ")
 
         # a vector of length B with loss of each sample
@@ -66,7 +66,7 @@ class TrainCNNModel(ModelDesc):
         # wd_cost = tf.multiply(1e-5,
         #                      regularize_cost('fc.*/W', tf.nn.l2_loss),
         #                      name='regularize_loss')
-        self.cost = tf.add_n([cost], name='total_cost')
+        self.cost = tf.identity(cost, name='total_cost')
         summary.add_moving_summary(cost, self.cost)
 
 
@@ -112,7 +112,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     return ds_train, ds_test
 
 
-def get_config(data, max_epoch=500, lr_decay_rate=0.95, run_inference=True):
+def get_config(data, max_epoch=500, lr_decay_rate=0.99, run_inference=True):
     dataset_train, dataset_test = data
 
     # How many iterations you want in each epoch.

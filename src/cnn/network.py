@@ -8,6 +8,7 @@ import numpy as np
 # Just import everything into current namespace
 from tensorpack import *
 from tensorpack.tfutils import summary
+from tensorpack.models.nonlin import Maxout
 from tensorflow.python.platform import flags
 
 from cnn.maxgroup import MaxGroup, maxgroup
@@ -18,11 +19,11 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 0.001
+WEIGHT_INIT_VARIANCE = 0.01
 BIAS_INIT_VARIANCE = 1.0
 
-DEFAULT_NL = tf.identity
-FC_NL = tf.nn.relu
+DEFAULT_NL = tf.nn.relu
+FC_NL = tf.identity
 
 def build_cnn(inputs):
     # In tensorflow, inputs to convolution function are assumed to be
@@ -103,20 +104,21 @@ def build_cnn(inputs):
                   W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
-                  .maxgroup('max0', size=24, group=2)
+                  .Maxout('max0', num_unit=2)
                   .Conv2D('conv1', out_channel=128)
-                  .maxgroup('max1', size=16, group=2)
+                  .Maxout('max1', num_unit=2)
                   .Conv2D('conv2', out_channel=256)
-                  .maxgroup('max2', size=8, group=2)
+                  .Maxout('max2', num_unit=2)
                   .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .maxgroup('max3', size=1, group=4)
+                  .Maxout('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
-                  .maxgroup('max4', size=1, group=4)
-                  #.pruneaxis('prune')
-                  .FullyConnected('fc', out_dim=36, nl=FC_NL,
-                                  b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
+                  .Maxout('max4', num_unit=4)
+                  # .pruneaxis('prune')
+                  .FullyConnected('fc', out_dim=36, nl=FC_NL)
+                                  # ,b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
                   ())
-        logits = tf.Print(logits, [logits], summarize=36)
+        #logits = tf.Print(logits, [logits], summarize=36)
+
         return logits
 
 
@@ -155,7 +157,7 @@ class CharacterPredictor(OfflinePredictor):
             session_init=SaverRestore(model),
             input_names=['input'],
             # TODO cannot choose max3. Fix this
-            output_names=['fc/output'])
+            output_names=['labels'])
             # output_names=['max3/output', 'labels'])
 
         super(CharacterPredictor, self).__init__(config)
@@ -174,7 +176,7 @@ class CharacterPredictor(OfflinePredictor):
 
         for slide in window.slides(image):
             slide = slide.reshape((1,  32, 32)).astype('float32')
-            print(self(slide))
+            #print(self(slide))
             yield self(slide)[output][0]
 
     def predict_features(self, image, step_size=16):

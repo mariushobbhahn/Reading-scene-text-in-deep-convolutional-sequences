@@ -16,6 +16,6 @@ def test(path, model):
         print("Failed to load image!")
         exit()
 
-    for char in predictor.predict_characters(img, step_size=8, map_to_char=False):
+    for char in predictor.predict_characters(img, step_size=5, map_to_char=False):
         char = int_label_to_char(np.argmax(char))
         print("Found character: {}".format(char))
