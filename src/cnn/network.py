@@ -19,8 +19,11 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 0.01
+WEIGHT_INIT_VARIANCE = 1
 BIAS_INIT_VARIANCE = 1.0
+
+def w_init_variance(k_size=9):
+    return WEIGHT_INIT_VARIANCE / (k_size * k_size)
 
 DEFAULT_NL = tf.nn.relu
 FC_NL = tf.identity
@@ -29,7 +32,7 @@ def build_cnn(inputs):
     # In tensorflow, inputs to convolution function are assumed to be
     # NHWC. Add a single channel here.
     inputs = tf.expand_dims(inputs, 3)
-    inputs = inputs * 2 - 1  # center the pixels values at zero
+    # inputs = tf.Print(inputs, [inputs], summarize=32)
 
     # activation = tf.identity
     #
@@ -109,12 +112,13 @@ def build_cnn(inputs):
                   .Maxout('max1', num_unit=2)
                   .Conv2D('conv2', out_channel=256)
                   .Maxout('max2', num_unit=2)
-                  .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .Maxout('max3', num_unit=4)
+                  # .Conv2D('conv3', kernel_shape=8, out_channel=512)
+                  # .Maxout('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .Maxout('max4', num_unit=4)
                   # .pruneaxis('prune')
                   .FullyConnected('fc', out_dim=36, nl=FC_NL)
+                  # .Maxout('maxfc', num_unit=4)
                                   # ,b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
                   ())
         #logits = tf.Print(logits, [logits], summarize=36)

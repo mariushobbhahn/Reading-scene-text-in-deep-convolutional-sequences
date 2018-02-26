@@ -13,15 +13,18 @@ class IIIT5K(NamedDataFlow):
 
     _cached_file = None
 
-    def __init__(self, train_or_test, data_dir=None, name="IIIT5K"):
+    def __init__(self, train_or_test, data_dir=None, unique=False, name="IIIT5K"):
         if data_dir is None:
             data_dir = os.path.join(config.DATA_DIR, name)
 
         self.train_or_test = train_or_test
         self.data_dir = data_dir
+        self.unique = unique
         super(IIIT5K, self).__init__(name)
 
     def size(self):
+        if (self.unique):
+            return 36
         return sum(1 for _ in self._get_mat_file())
 
     def get_name(self):
@@ -51,9 +54,9 @@ class IIIT5K(NamedDataFlow):
           Parses the image path, label and the char bounds for every data point from the mat file.
         :return: A tuple with (path, label, char_bounds).
         """
-
         # yield every entry of the file
         for (path, label, bounds) in self._get_mat_file():
+
             yield (path[0, ], label[0, ], bounds)
 
     def _get_images(self):
@@ -69,6 +72,8 @@ class IIIT5K(NamedDataFlow):
             # Load image as grayscale
             img_file = os.path.join(self.data_dir, path)
             img = cv2.imread(img_file, cv2.IMREAD_GRAYSCALE)
+            img = img / 255.0 # convert uint8 -> float
+            img = img * 2 - 1  # center the pixels values at zero
 
             yield (img, label, bounds)
 
@@ -94,10 +99,16 @@ class IIIT5KChar(IIIT5K):
       Returns (image, label) data points, where label is an integer between 0 and 35 and image a 32x32 grayscale image.
     """
 
+    def __init__(self, train_or_test, data_dir=None, unique=False, name="IIIT5K"):
+        super(IIIT5KChar, self).__init__(train_or_test=train_or_test, data_dir=data_dir, unique=unique, name=name)
+
     def get_name(self):
         return self._name + "_char_" + self.train_or_test
 
     def get_data(self):
+        known_labels = set()
+        last_index = -10
+        index = 0
         for (img, label, char_bounds) in self._get_images():
             # convert string to list of chars
             chars = list(label)
@@ -113,8 +124,16 @@ class IIIT5KChar(IIIT5K):
             scale = 32.0 / img_height
 
             for (char, bounds) in zip(chars, char_bounds):
+                label = char_to_int_label(char)
                 # Bounds is array with [x, y, w, h]
                 # Cutoff quadratic images with full height, centered around the char.
+                index = index + 1
+                if self.unique and (label in known_labels or (index < last_index + 10)):
+                    # print('no')
+                    continue
+
+                known_labels.add(label)
+                last_index = index
 
                 center_x = bounds[0] + bounds[2] / 2
 
@@ -135,4 +154,4 @@ class IIIT5KChar(IIIT5K):
                     char_img = cv2.resize(char_img, None, fx=scale, fy=scale)
 
                 # print("Yield image for char {} with label {}".format(char, char_to_int_label(char)))
-                yield (char_img, char_to_int_label(char))
+                yield (char_img, label)

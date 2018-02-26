@@ -2,6 +2,7 @@ import config as cfg
 import tensorflow as tf
 import data.utils
 import os
+import numpy as np
 
 # Just import everything into current namespace
 from tensorpack import *
@@ -39,12 +40,12 @@ class TrainCNNModel(ModelDesc):
         logits = tf.Print(logits,
                           [tf.argmax(logits, dimension=1, name='prediction')],
                           # [tf.nn.softmax(logits, name='sm')],
-                          summarize=4,
+                          summarize=8,
                           message="pred: ")
 
         label = tf.Print(label,
                          [label],
-                         summarize=4,
+                         summarize=8,
                          message="labels: ")
 
         # a vector of length B with loss of each sample
@@ -88,8 +89,8 @@ class TrainCNNModel(ModelDesc):
 
 
 def get_data(unique=False, sub_data=None, batch_size=128):
-    ds_train = data.utils.load_lmdb(IIIT5KChar('train'))
-    ds_test = data.utils.load_lmdb(IIIT5KChar('test'))
+    ds_train = data.utils.load_lmdb(IIIT5KChar('train', unique=unique))
+    ds_test = data.utils.load_lmdb(IIIT5KChar('test', unique=unique))
 
     if unique:
         print("Use one data point per label")
@@ -109,6 +110,9 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     ds_train = BatchData(ds_train, batch_size)
     ds_test = BatchData(ds_test, 2 * batch_size, remainder=True)
 
+    # da = ds_train.get_data()
+    # for x in da:
+    #     print(x)
     return ds_train, ds_test
 
 
