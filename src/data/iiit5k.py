@@ -128,7 +128,7 @@ class IIIT5KChar(IIIT5K):
                 # Bounds is array with [x, y, w, h]
                 # Cutoff quadratic images with full height, centered around the char.
                 index = index + 1
-                if self.unique and (label in known_labels or (index < last_index + 10)):
+                if self.unique and (label in known_labels or (index < last_index + 25)):
                     # print('no')
                     continue
 

@@ -52,7 +52,8 @@ class TrainCNNModel(ModelDesc):
         cost = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=label)
         cost = tf.reduce_mean(cost, name='cross_entropy_loss')  # the average cross-entropy loss
 
-        correct = tf.cast(tf.nn.in_top_k(logits, label, 1), tf.float32, name='correct')
+        result = tf.argmax(logits, dimension=1, output_type=tf.int32)
+        correct = tf.cast(tf.equal(result, label), tf.float32, name='correct')
         accuracy = tf.reduce_mean(correct, name='accuracy')
 
         # This will monitor training error (in a moving_average fashion):
@@ -116,7 +117,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     return ds_train, ds_test
 
 
-def get_config(data, max_epoch=500, lr_decay_rate=0.99, run_inference=True):
+def get_config(data, max_epoch=1500, lr_decay_rate=0.99, run_inference=True):
     dataset_train, dataset_test = data
 
     # How many iterations you want in each epoch.

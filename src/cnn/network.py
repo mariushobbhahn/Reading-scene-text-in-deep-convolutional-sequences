@@ -19,7 +19,7 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 1
+WEIGHT_INIT_VARIANCE = 0.1
 BIAS_INIT_VARIANCE = 1.0
 
 def w_init_variance(k_size=9):
@@ -104,6 +104,7 @@ def build_cnn(inputs):
                   padding='valid',
                   kernel_shape=9,
                   nl=DEFAULT_NL,
+                  # b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE),
                   W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
@@ -112,8 +113,8 @@ def build_cnn(inputs):
                   .Maxout('max1', num_unit=2)
                   .Conv2D('conv2', out_channel=256)
                   .Maxout('max2', num_unit=2)
-                  # .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  # .Maxout('max3', num_unit=4)
+                  .Conv2D('conv3', kernel_shape=8, out_channel=512)
+                  .Maxout('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .Maxout('max4', num_unit=4)
                   # .pruneaxis('prune')
