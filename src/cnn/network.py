@@ -19,7 +19,7 @@ from data.utils import int_label_to_char
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 0.1
+WEIGHT_INIT_VARIANCE = 0.001
 BIAS_INIT_VARIANCE = 1.0
 
 def w_init_variance(k_size=9):
@@ -29,6 +29,9 @@ DEFAULT_NL = tf.nn.relu
 FC_NL = tf.identity
 
 def build_cnn(inputs):
+    inputs = inputs / 255.0 # convert uint8 -> float
+    inputs = inputs * 2
+    inputs = inputs - 1
     # In tensorflow, inputs to convolution function are assumed to be
     # NHWC. Add a single channel here.
     inputs = tf.expand_dims(inputs, 3)

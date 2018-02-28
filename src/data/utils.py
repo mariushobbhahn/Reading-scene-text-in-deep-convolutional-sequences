@@ -81,7 +81,7 @@ def convert_image_to_array(img):
         raise RuntimeError("Failed to convert image to png!")
 
 
-def dump_data(df, dir, count=100, start=0, step=1):
+def dump_data(df, dir, count=150, start=0, step=1):
     """
     Dumps part of the given data flow into the given dir.
     The files will be named "{index}_{label}.png" where label is the human-readable character.
@@ -104,6 +104,7 @@ def dump_data(df, dir, count=100, start=0, step=1):
 
     for (img, label) in df.get_data():
         char = int_label_to_char(label)
+        # img = img.astype(int)
 
         file = os.path.join(dir, "{}_{}.png".format(index, char))
         index += 1

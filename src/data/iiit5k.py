@@ -72,8 +72,6 @@ class IIIT5K(NamedDataFlow):
             # Load image as grayscale
             img_file = os.path.join(self.data_dir, path)
             img = cv2.imread(img_file, cv2.IMREAD_GRAYSCALE)
-            img = img / 255.0 # convert uint8 -> float
-            img = img * 2 - 1  # center the pixels values at zero
 
             yield (img, label, bounds)
 
@@ -128,7 +126,7 @@ class IIIT5KChar(IIIT5K):
                 # Bounds is array with [x, y, w, h]
                 # Cutoff quadratic images with full height, centered around the char.
                 index = index + 1
-                if self.unique and (label in known_labels or (index < last_index + 25)):
+                if self.unique and (label in known_labels or (index < last_index + 8)):
                     # print('no')
                     continue
 

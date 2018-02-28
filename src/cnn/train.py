@@ -96,6 +96,8 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     if unique:
         print("Use one data point per label")
         ds_train = UniqueData(ds_train)
+        # for unique set, run validation on same data
+        ds_test = UniqueData(data.utils.load_lmdb(IIIT5KChar('train', unique=unique)))
 
     if sub_data:
         print("Uses only {} data points".format(sub_data))
