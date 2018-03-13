@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow as tf
+
 from tensorflow import Print as tfp
 from tensorflow import get_variable_scope
 from tensorflow.python.eager import context
@@ -29,6 +31,30 @@ from tensorflow.python.ops import gen_array_ops
 from tensorflow.python.layers import base
 
 from tensorpack.models.common import layer_register
+
+@layer_register(use_scope=None)
+def Maxout2(x, num_unit):
+    """
+    Fixed version of the Tensorpack maxout.
+
+    Args:
+        x (tf.Tensor): a NHWC or NC tensor. Channel has to be known.
+        num_unit (int): a int. Must be divisible by C.
+
+    Returns:
+        tf.Tensor: of shape NHW(C/num_unit) named ``output``.
+    """
+    input_shape = x.get_shape().as_list()
+    ndim = len(input_shape)
+    assert ndim == 4 or ndim == 2
+    ch = input_shape[-1]
+    assert ch is not None and ch % num_unit == 0
+    if ndim == 4:
+        x = tf.reshape(x, [-1, input_shape[1], input_shape[2], ch // num_unit, num_unit])
+    else:
+        x = tf.reshape(x, [-1, ch / num_unit, num_unit])
+    return tf.reduce_max(x, ndim, name='output')
+
 
 @layer_register(log_shape=True)
 def maxgroup(inputs, size, group, axis=3, name=None):

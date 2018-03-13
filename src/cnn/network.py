@@ -15,6 +15,7 @@ from cnn.maxgroup import MaxGroup, maxgroup
 from tensorpack.predict import OfflinePredictor, PredictConfig
 from utils.window import SlidingWindow
 from data.utils import int_label_to_char
+from cnn.maxgroup import Maxout2
 
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
@@ -111,15 +112,15 @@ def build_cnn(inputs):
                   W_init=tf.contrib.layers.variance_scaling_initializer(WEIGHT_INIT_VARIANCE)):
         logits = (LinearWrap(inputs)
                   .Conv2D('conv0', out_channel=96)
-                  .Maxout('max0', num_unit=2)
+                  .Maxout2('max0', num_unit=2)
                   .Conv2D('conv1', out_channel=128)
-                  .Maxout('max1', num_unit=2)
+                  .Maxout2('max1', num_unit=2)
                   .Conv2D('conv2', out_channel=256)
-                  .Maxout('max2', num_unit=2)
+                  .Maxout2('max2', num_unit=2)
                   .Conv2D('conv3', kernel_shape=8, out_channel=512)
-                  .Maxout('max3', num_unit=4)
+                  .Maxout2('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
-                  .Maxout('max4', num_unit=4)
+                  .Maxout2('max4', num_unit=4)
                   # .pruneaxis('prune')
                   .FullyConnected('fc', out_dim=36, nl=FC_NL)
                   # .Maxout('maxfc', num_unit=4)
