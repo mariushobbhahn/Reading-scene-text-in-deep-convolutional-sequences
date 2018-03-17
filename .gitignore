@@ -5,7 +5,7 @@
 res/data/
 res/dump/
 res/train_log/
-res/cnn_model/
+res/cnn_model/schulte*
 
 # ignore logs
 src/train_log/

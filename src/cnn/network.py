@@ -38,70 +38,6 @@ def build_cnn(inputs):
     inputs = tf.expand_dims(inputs, 3)
     # inputs = tf.Print(inputs, [inputs], summarize=32)
 
-    # activation = tf.identity
-    #
-    # logits = tf.layers.conv2d(inputs=inputs,
-    #                           filters=96,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv0')
-    #
-    # logits = Maxout(num_units=48, name='max0').apply(logits)
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=128,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv1')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=64,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=256,
-    #                           kernel_size=[9, 9],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv2')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=128,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=512,
-    #                           kernel_size=[8, 8],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv3')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=128,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.layers.conv2d(inputs=logits,
-    #                           filters=144,
-    #                           kernel_size=[1, 1],
-    #                           padding='valid',
-    #                           activation=activation,
-    #                           name='conv4')
-    #
-    # logits = tf.contrib.layers.maxout(inputs=logits,
-    #                           num_units=36,
-    #                           axis=3,
-    #                           name='max1')
-    #
-    # logits = tf.reshape(tensor=logits,
-    #                     shape=[1, 36],
-    #                     name='prune')
-
     # The context manager `argscope` sets the default option for all the layers under
     # this context. Here we use convolution with shape 9x9
     with argscope(Conv2D,
@@ -151,6 +87,7 @@ def _map_prediction(p):
     :return: A character from A to Z or 0 to 9.
     """
     max_index = np.argmax(p)
+    max_value = p[max_index]
 
     return "{} ({}%)".format(int_label_to_char(max_index), int(max_value * 100))
 
@@ -166,10 +103,11 @@ class CharacterPredictor(OfflinePredictor):
             session_init=SaverRestore(model),
             input_names=['input'],
             # TODO cannot choose max3. Fix this
-            output_names=['labels'])
+            output_names=['max3/output', 'labels'])
             # output_names=['max3/output', 'labels'])
 
         super(CharacterPredictor, self).__init__(config)
+
 
     def _predict(self, image, step_size, output):
         # Resize image if needed
@@ -196,7 +134,8 @@ class CharacterPredictor(OfflinePredictor):
         :param step_size: The step size in pixels by which the sliding window will be moved after each step.
         :yield: The 128D feature vector predicted in the current step
         """
-        self._predict(image, step_size, 0)
+        for p in self._predict(image, step_size, 0):
+            yield p
 
     def predict_characters(self, image, step_size=16, map_to_char=False):
         """
@@ -208,6 +147,6 @@ class CharacterPredictor(OfflinePredictor):
         character label with the highest prediction value.
         :yield: The 36D prediciton vector or the character label predicted in the current step.
         """
-        # TODO choose output 1 if tensor is fixed
-        for p in self._predict(image, step_size, 0):
+
+        for p in self._predict(image, step_size, 1):
             yield _map_prediction(p) if map_to_char else p
