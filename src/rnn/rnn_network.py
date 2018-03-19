@@ -18,40 +18,45 @@ Each probability-vector contains 128 probabilities for a given character.
 Due to the unsegmented nature of the word image at the character level, the length of the LSTM outputs is not consistent with the length of a target word string.
 We therefore apply the CTC approach to make reasonable character sequences out of the probability-vector (see https://www.tensorflow.org/versions/r0.12/api_docs/python/nn/connectionist_temporal_classification__ctc_)
 
-The output of the CTC is then returned
+The output of the LSTM is then given into the CTC.
 """
 
-"""
-TODOs:
+"""Image break down; returns a sequence of frames"""
 
-- where do the probability vectors come from?
-- implement CTC
-"""
+"""Application of CNN on every frame; returns a sequence of 128D-vectors"""
+sequence_of_128D_vectors = []
 
-input = [] #sequence of vectors (128d)
-frame_size = 128 #len(input[0])
-batch_size = 1 #sollte tf irgendwann für uns regeln gibt die Zahl an parallelen Prozessen an
-
-lstm1 = tf.contrib.rnn.BasicLSTMCell(frame_size)
-lstm2 = tf.contrib.rnn.BasicLSTMCell(frame_size)
+"""RNN: 128LSTM_cells per layer, fully connected 37 neuron layer in the end"""
 
 
-hidden_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
-current_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
-state_1 = hidden_state_1, current_state_1
+def build_rnn(input_images):
+    #cut the picture in a sequence of frames:
 
-#hidden_state_2, current_state_2, state_2 = hidden_state_1, current_state_1, state_1
-
-
-for i in range(batch_size):
-    # The value of state is updated after processing each batch of words.
-    output_1, state_1 = lstm1(input[i], state_1)
-    #output_2, state_2 = lstm2(input[len(input) - i], state_2)
-
-    softmax_c = tf.nn.softmax(output_1) #softmax on the
-    logits = tf.matmul(output_1, softmax_c) #fully connected layer
-    probabilities.append(tf.nn.softmax(logits))
-    #there is no loss function, since at this point we do not have a reasonable comparison
+    #apply the already trained CNN on each frame and return a sequence of 128D-vectors
 
 
-#now we need to take our CTC and let it run over the probability vectors
+    """Constants:"""
+    seq_length = len(sequence_of_128D_vectors)
+    num_LSTMs_per_layer = 128  # as described in the paper
+
+    """RNN Cells"""
+    # one cell
+    single_LSTM_cell = rnn.BasicLSTMCell(num_units=num_neurons, activation=tf.nn.relu)
+    # bidirectional LSTM with 128 layers each
+    outputs_lstm, states_lstm = rnn.stack_bidirectional_rnn(
+        cells_fw=[single_LSTM_cell for layer in range(num_LSTMs_per_layer)],
+        cells_bw=[single_LSTM_cell for layer in range(num_LSTMs_per_layer)],
+        inputs=X)
+
+    """fully connected layer"""
+
+    logits = tf.contrib.layers.fully_connected(
+        inputs=outputs_lstm,
+        num_outputs=37,  # these are the 36 characters plus the symbol for no character
+        activation_fn=tf.nn.relu)
+
+    #softmax as described in the paper:
+
+    logits = tf.nn.softmax(logits, name='final_logits')
+
+    return(logits)
