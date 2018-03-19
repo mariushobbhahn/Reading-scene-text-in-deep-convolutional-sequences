@@ -13,7 +13,7 @@ from cnn.network import CharacterPredictor
 from data.iiit5k import IIIT5K
 from data.dataset import *
 from data.predicted import PredictFeatures
-from rnn_network import *
+from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
 
