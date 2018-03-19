@@ -6,6 +6,7 @@ import config
 
 from cnn.train import train
 from cnn.test import test
+from rnn.train_rnn import train_rnn
 
 
 def main(argv):
@@ -24,8 +25,10 @@ def main(argv):
     parser.add_argument('--sub-data', dest='sub_data', help='uses only the given amount of data points.')
     parser.add_argument('-r', action='store_true', dest="remove_lmdb", help='if set, the old .mdb files will be removed.')
 
-    #TODO Implement test mode
     parser.add_argument('--test', help='predicts the characters in the image at the given path')
+    parser.add_argument('--train-rnn', dest='train_rnn', action='store_true', help="trains the rnn")
+    parser.add_argument('--step-size', dest='step_size', help="step size for the sliding window rnn")
+
 
     # parse arguments
     args = parser.parse_args()
@@ -36,9 +39,17 @@ def main(argv):
     config.REMOVE_LMDB = args.remove_lmdb
     config.DUMP_DIR = os.path.join(config.RES_DIR, 'dump') if args.dump else None
 
+    model = args.load or os.path.join(config.RES_DIR, 'cnn_model/max-validation_accuracy')
+
     if args.test:
-        model = args.load or os.path.join(config.RES_DIR, 'train_log/jan0226-223108/checkpoint')
         test(args.test, model)
+    elif args.train_rnn:
+        step_size = args.step_size if args.step_size else 16
+        train_rnn(model,
+                  step_size,
+                  unique=args.unique or False,
+                  sub_data=int(args.sub_data) if args.sub_data else None,
+                  batch_size=int(args.batch_size) if args.batch_size else 128)
     else:
         # start training
         train(unique=args.unique or False,
