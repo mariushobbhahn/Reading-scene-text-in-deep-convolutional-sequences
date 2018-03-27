@@ -58,7 +58,7 @@ class TrainRNNModel(ModelDesc):
 
         # a vector of length B with loss of each sample
         cost = tf.nn.ctc_loss(
-            labels=labels,
+            labels=label,
             inputs=decoded,
             sequence_length=sequence_length
         )
@@ -67,10 +67,10 @@ class TrainRNNModel(ModelDesc):
         #constant for momentum term: 0.9 as in the paper
         MOMENTUM_TERM = 0.9
 
-        optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE, beta1=MOMENTUM_TERM)
+        optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE, beta1=MOMENTUM_TERM) #is this necessary here?
         cost = optimizer.minimize(cost)
 
-        result = tf.argmax(logits, dimension=1, output_type=tf.int32) #is this the correct output type?
+        result = tf.argmax(decoded, dimension=1, output_type=tf.int32) #is this the correct output type?
         correct = tf.cast(tf.equal(result, label), tf.float32, name='correct') #is this the correct output type?
         accuracy = tf.reduce_mean(correct, name='accuracy')
 
@@ -166,3 +166,7 @@ def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None)
     for (features, label) in ds_train.get_data():
         print('{}: {}'.format(label, features))
 
+    config = get_config(data, run_inference=True)
+
+    # TODO change trainer
+    launch_train_with_config(config, SimpleTrainer())
