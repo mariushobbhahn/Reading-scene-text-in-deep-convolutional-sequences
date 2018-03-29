@@ -26,7 +26,7 @@ class TrainRNNModel(ModelDesc):
         the graph will need.
         """
 
-        return [InputDesc(tf.float32, (None, self.max_length, self.input_vector_size), 'input'),
+        return [InputDesc(tf.float32, (None, 128), 'input'),
                 InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
@@ -40,6 +40,7 @@ class TrainRNNModel(ModelDesc):
         logits = build_rnn(features)
 
         """CTC"""
+        print("Logits: {}".format(logits.shape))
         decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
                                                            sequence_length=self.max_length)  # log prob will not be used afterwards
 
