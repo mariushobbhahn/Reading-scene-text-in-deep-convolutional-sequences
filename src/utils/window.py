@@ -25,7 +25,7 @@ class SlidingWindow:
     def slides(self, image):
         (h, w) = image.shape
 
-        print("Image size: {}x{}  Slides: {}".format(w, h, self.number_of_slides(image)))
+        # print("Image size: {}x{}  Slides: {}".format(w, h, self.number_of_slides(image)))
 
         for i in range(0, self.number_of_slides(image)):
             x = i * self.step_size
@@ -33,7 +33,7 @@ class SlidingWindow:
             x = max(0, min(x, w - h))
             img = image[0:, x:(x + h)]
 
-            print("Move sliding window to {}, got {}".format(x, img.shape))
+            # print("Move sliding window to {}, got {}".format(x, img.shape))
 
             yield img
 

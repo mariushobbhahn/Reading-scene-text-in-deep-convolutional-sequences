@@ -134,8 +134,10 @@ class CharacterPredictor(OfflinePredictor):
         :param step_size: The step size in pixels by which the sliding window will be moved after each step.
         :yield: The 128D feature vector predicted in the current step
         """
+
         for p in self._predict(image, step_size, 0):
-            yield p
+            #print("Shape: {}".format(p.reshape(128).shape))
+            yield p.reshape(128)
 
     def predict_characters(self, image, step_size=16, map_to_char=False):
         """
