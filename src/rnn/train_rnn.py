@@ -26,7 +26,8 @@ class TrainRNNModel(ModelDesc):
         Define all the inputs (with type, shape, name) that
         the graph will need.
         """
-        return [InputDesc(tf.float32, (None, self.max_length, self.input_vector_size), 'input'),
+        # TODO Input is a sequence of 128D vectors and a n-length label
+        return [InputDesc(tf.float32, (None, 128), 'input'),
                 InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
@@ -34,7 +35,7 @@ class TrainRNNModel(ModelDesc):
         and define self.cost at the end"""
 
         # inputs contains a list of input variables defined above
-        image, label = inputs
+        features, label = inputs
         # constant for the length of this particular sequence
         sequence_length = len(image)
 
@@ -63,12 +64,8 @@ class TrainRNNModel(ModelDesc):
             inputs=decoded,
             sequence_length=sequence_length
         )
-        #constant for learning rate: 0.0001 as in the paper
-        LEARNING_RATE = 0.0001
-        #constant for momentum term: 0.9 as in the paper
-        MOMENTUM_TERM = 0.9
 
-        optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE, beta1=MOMENTUM_TERM) #is this necessary here?
+        optimizer = self._get_optimizer()
         cost = optimizer.minimize(cost)
 
         result = tf.argmax(decoded, dimension=1, output_type=tf.int32) #is this the correct output type?
@@ -82,10 +79,8 @@ class TrainRNNModel(ModelDesc):
         train_error = tf.reduce_mean(1 - correct, name='train_error')
         summary.add_moving_summary(train_error, accuracy)
 
-
         self.cost = tf.identity(cost, name='total_cost')
         summary.add_moving_summary(cost, self.cost)
-
 
     def _get_optimizer(self):
         #we use the adam optimizer for simplicity
@@ -137,7 +132,7 @@ def get_data(model, step_size, unique, sub_data, batch_size):
         print("Use one data point per label")
         ds_train = UniqueData(ds_train)
         # for unique set, run validation on same data
-        ds_test = UniqueData(data.utils.load_lmdb(IIIT5KChar('train', unique=unique)))
+        ds_test = UniqueData(data.utils.load_lmdb(IIIT5K('train', unique=unique)))
 
     if sub_data:
         print("Uses only {} data points".format(sub_data))
@@ -156,7 +151,7 @@ def get_data(model, step_size, unique, sub_data, batch_size):
     predictor = CharacterPredictor(model)
 
     ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
-    ds_test  = PredictFeatures(ds_test, predictor, step_size=step_size)
+    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
 
     return ds_train, ds_test
 
@@ -164,8 +159,13 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
     data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
-    # for (features, label) in ds_train.get_data():
-    #     print('{}: {}'.format(label, features))
+    max_length = 0
+
+    # for (features, label) in ds_test.get_data():
+    #     if len(features) > max_length:
+    #         max_length = len(features)
+    #         print("Max len: {}".format(max_length))
+
 
     config = get_config(data, run_inference=True)
 
