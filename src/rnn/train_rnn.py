@@ -16,7 +16,7 @@ from data.predicted import PredictFeatures
 from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
-    def __init__(self, max_length=30):
+    def __init__(self, max_length=36):
         self.max_length = max_length
         self.input_vector_size = 128
 
@@ -25,8 +25,8 @@ class TrainRNNModel(ModelDesc):
         Define all the inputs (with type, shape, name) that
         the graph will need.
         """
-        # TODO Input is a sequence of 128D vectors and a n-length label
-        return [InputDesc(tf.float32, (None, 128), 'input'),
+
+        return [InputDesc(tf.float32, (None, self.max_length, self.input_vector_size), 'input'),
                 InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
@@ -35,14 +35,13 @@ class TrainRNNModel(ModelDesc):
 
         # inputs contains a list of input variables defined above
         features, label = inputs
-        # constant for the length of this particular sequence
-        sequence_length = len(image)
 
-        logits = build_RNN(image)
+        #build the graph
+        logits = build_rnn(features)
 
         """CTC"""
         decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
-                                                           sequence_length=seq_length)  # log prob will not be used afterwards
+                                                           sequence_length=self.max_length)  # log prob will not be used afterwards
 
         # print the predicted labels for the first data point in each step.
         decoded = tf.Print(decoded,
@@ -156,6 +155,10 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 
 
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
+
+    # automatically setup the directory for logging
+    logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
+
     data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
     max_length = 0

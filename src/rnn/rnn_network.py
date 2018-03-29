@@ -38,7 +38,9 @@ def build_rnn(sequence_of_128D_vectors):
     outputs_lstm, states_lstm = rnn.stack_bidirectional_rnn(
         cells_fw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
         cells_bw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
-        inputs=sequence_of_128D_vectors)
+        inputs=[sequence_of_128D_vectors],
+        dtype=tf.float32
+    )
 
     """fully connected layer on top"""
 
