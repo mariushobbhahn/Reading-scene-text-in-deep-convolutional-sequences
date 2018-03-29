@@ -127,17 +127,6 @@ def get_data(model, step_size, unique, sub_data, batch_size):
     ds_train = data.utils.load_lmdb(IIIT5K('train', unique=unique))
     ds_test = data.utils.load_lmdb(IIIT5K('test', unique=unique))
 
-    predictor = CharacterPredictor(model)
-
-    ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
-    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
-
-    ds_train.name = "IIIT5K_train_prediction"
-    ds_test.name = "IIIT5K_test_prediction"
-
-    ds_train = data.utils.load_lmdb(ds_train)
-    ds_test = data.utils.load_lmdb(ds_test)
-
     if unique:
         print("Use one data point per label")
         ds_train = UniqueData(ds_train)
@@ -158,13 +147,24 @@ def get_data(model, step_size, unique, sub_data, batch_size):
     #ds_train = BatchData(ds_train, batch_size)
     #ds_test = BatchData(ds_test, 2 * batch_size, remainder=True)
 
+    predictor = CharacterPredictor(model)
 
+    ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
+    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
 
     return ds_train, ds_test
 
 
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
-    data = get_data(model, step_size, unique, sub_data, batch_size)
+    data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
+
+    max_length = 0
+
+    # for (features, label) in ds_test.get_data():
+    #     if len(features) > max_length:
+    #         max_length = len(features)
+    #         print("Max len: {}".format(max_length))
+
 
     config = get_config(data, run_inference=True)
 
