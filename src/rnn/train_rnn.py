@@ -17,15 +17,16 @@ from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
 
-    def __init__(self, image_size=32):
-        self.image_size = int(image_size)
+    def __init__(self, max_length=30):
+        self.max_length = max_length
+        self.input_vector_size = 128
 
     def _get_inputs(self):
         """
         Define all the inputs (with type, shape, name) that
         the graph will need.
         """
-        return [InputDesc(tf.float32, (None, self.image_size, self.image_size), 'input'),
+        return [InputDesc(tf.float32, (None, self.max_length, self.input_vector_size), 'input'),
                 InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
@@ -161,10 +162,10 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 
 
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
-    (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
+    data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
-    for (features, label) in ds_train.get_data():
-        print('{}: {}'.format(label, features))
+    # for (features, label) in ds_train.get_data():
+    #     print('{}: {}'.format(label, features))
 
     config = get_config(data, run_inference=True)
 
