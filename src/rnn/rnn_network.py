@@ -26,15 +26,11 @@ The output of the LSTM is then given into the CTC. (This happens in the train cl
 """RNN: 128LSTM_cells per layer, fully connected 37 neuron layer in the end"""
 
 
-
-
-
-def build_rnn(inputs, sequence_length):
+def build_rnn(input):
     """Constants:"""
     # TODO lenght not known at this point
     # seq_length = len(sequence_of_128D_vectors)
 
-    # inputs = tf.expand_dims(inputs, 3)
     num_LSTMs_per_layer = 128  # as described in the paper
 
     """RNN Cells"""
@@ -53,21 +49,15 @@ def build_rnn(inputs, sequence_length):
                                                  dtype=tf.float32)
 
 
-    # Concatenate outputs from fw and bw layer
-    logits = tf.concat(outputs, 2)
-    print("RNN output shape: {}".format(logits.shape))
+    """fully connected layer on top"""
 
-
-    # Logits contains the predicted character for every 36 possible frames.
-    logits = tf.contrib.layers.fully_connected(
-        inputs=logits,
+    decoded_sequence = tf.contrib.layers.fully_connected(
+        inputs=outputs,
         num_outputs=37,  # these are the 36 characters plus the symbol for no character
         activation_fn=tf.identity)
 
-    print("FC shape: {}".format(logits.shape))
-
     """softmax as described in the paper"""
 
-    logits = tf.nn.softmax(logits, name='final_logits')
+    decoded_sequence = tf.nn.softmax(decoded_sequence, name='final_logits')
 
-    return logits
+    return decoded_sequence
