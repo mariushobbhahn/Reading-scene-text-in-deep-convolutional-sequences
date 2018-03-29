@@ -16,7 +16,6 @@ from data.predicted import PredictFeatures
 from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
-
     def __init__(self, max_length=30):
         self.max_length = max_length
         self.input_vector_size = 128
@@ -27,7 +26,7 @@ class TrainRNNModel(ModelDesc):
         the graph will need.
         """
         # TODO Input is a sequence of 128D vectors and a n-length label
-        return [InputDesc(tf.float32, (None, 128), 'input'),
+        return [InputDesc(tf.float32, (None, self.max_length, self.input_vector_size), 'input'),
                 InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
@@ -37,9 +36,9 @@ class TrainRNNModel(ModelDesc):
         # inputs contains a list of input variables defined above
         features, label = inputs
         # constant for the length of this particular sequence
-        sequence_length = len(image)
+        sequence_length = len(inputs)
 
-        logits = build_RNN(image)
+        logits = build_RNN(inputs)
 
         """CTC"""
         decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
