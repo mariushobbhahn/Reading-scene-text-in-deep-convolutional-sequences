@@ -166,7 +166,7 @@ def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None)
     for (features, label) in ds_train.get_data():
         print('{}: {}'.format(label, features))
 
-    config = get_config(data, run_inference=True)
+    config = get_config(ds_train, run_inference=True)
 
     # TODO change trainer
     launch_train_with_config(config, SimpleTrainer())
