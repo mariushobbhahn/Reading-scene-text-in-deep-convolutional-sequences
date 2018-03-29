@@ -38,7 +38,7 @@ class TrainRNNModel(ModelDesc):
         # constant for the length of this particular sequence
         sequence_length = len(inputs)
 
-        logits = build_RNN(inputs)
+        logits = build_rnn(inputs)
 
         """CTC"""
         decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
@@ -156,6 +156,10 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 
 
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
+
+    # automatically setup the directory for logging
+    logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
+
     data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
     max_length = 0
@@ -166,7 +170,7 @@ def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None)
     #         print("Max len: {}".format(max_length))
 
 
-    config = get_config(ds_train, run_inference=True)
+    config = get_config(data, run_inference=True)
 
     # TODO change trainer
     launch_train_with_config(config, SimpleTrainer())
