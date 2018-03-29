@@ -15,6 +15,15 @@ from data.dataset import *
 from data.predicted import PredictFeatures
 from rnn.rnn_network import *
 
+
+def length(sequence):
+    used = tf.sign(tf.reduce_max(tf.abs(sequence), 2))
+    l = tf.reduce_sum(used, 1)
+    l = tf.cast(l, tf.int32)
+
+    return l
+
+
 class TrainRNNModel(ModelDesc):
     def __init__(self, max_length=36):
         self.max_length = max_length
@@ -26,8 +35,9 @@ class TrainRNNModel(ModelDesc):
         the graph will need.
         """
 
-        return [InputDesc(tf.float32, (None, 128), 'input'),
-                InputDesc(tf.int32, (None,), 'label')]
+        return [InputDesc(tf.float32, (None, 36, 128), 'input'),
+                InputDesc.from_placeholder(tf.sparse_placeholder(tf.int32))]
+                #InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
         """This function should build the model which takes the input variables
@@ -36,32 +46,48 @@ class TrainRNNModel(ModelDesc):
         # inputs contains a list of input variables defined above
         features, label = inputs
 
+        seq_length = length(features)
+
         #build the graph
-        logits = build_rnn(features)
+        logits = build_rnn(features, seq_length)
+
+        logits = tf.transpose(logits, (1, 0, 2))
 
         """CTC"""
         print("Logits: {}".format(logits.shape))
         decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
-                                                           sequence_length=self.max_length)  # log prob will not be used afterwards
+                                                           sequence_length=seq_length)  # log prob will not be used afterwards
+
+        # print("Decoded length: {}".format(len(decoded)))
+
+        # for d in decoded:
+           # print("Indices {}, Values {}, Shape {}, ".format(d.indices, d.values, d.dense_shape))
+
+
+        decoded = decoded[0]
+
+        log_probs = tf.Print(log_probs,
+                             [decoded.indices, decoded.values],
+                             message="Decoded: ")
 
         # print the predicted labels for the first data point in each step.
-        decoded = tf.Print(decoded,
-                          [tf.argmax(decoded, dimension=1, name='prediction')],
-                          # [tf.nn.softmax(decoded, name='sm')],
-                          summarize=8,
-                          message="prediction: ")
+        # out = tf.Print(decoded[0].indices,
+        #                   [tf.argmax(decoded, axis=1, name='prediction')],
+        #                   # [tf.nn.softmax(decoded, name='sm')],
+        #                   summarize=8,
+        #                   message="prediction: ")
 
-        label = tf.Print(label,
-                         [label],
-                         summarize=8,
-                         message="labels: ")
+        # label = tf.Print(label,
+        #                  [label],
+        #                  summarize=8,
+        #                  message="labels: ")
 
 
         # a vector of length B with loss of each sample
         cost = tf.nn.ctc_loss(
-            labels=label,
-            inputs=decoded,
-            sequence_length=sequence_length
+            labels=decoded,
+            inputs=logits,
+            sequence_length=seq_length
         )
 
         optimizer = self._get_optimizer()

@@ -26,33 +26,48 @@ The output of the LSTM is then given into the CTC. (This happens in the train cl
 """RNN: 128LSTM_cells per layer, fully connected 37 neuron layer in the end"""
 
 
-def build_rnn(input):
+
+
+
+def build_rnn(inputs, sequence_length):
     """Constants:"""
     # TODO lenght not known at this point
     # seq_length = len(sequence_of_128D_vectors)
 
+    # inputs = tf.expand_dims(inputs, 3)
     num_LSTMs_per_layer = 128  # as described in the paper
 
     """RNN Cells"""
     # bidirectional LSTM with 128 layers each
-    (outputs, _, _) = rnn.stack_bidirectional_rnn(
-        cells_fw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
-        cells_bw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
-        inputs=[input],
-        dtype=tf.float32
-    )
+    # (outputs, _, _) = rnn.stack_bidirectional_rnn(
+    #    cells_fw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
+    #    cells_bw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
+    #    inputs=[input],
+    #    dtype=tf.float32
+    # )
+
+    outputs, _ = tf.nn.bidirectional_dynamic_rnn(rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh),
+                                                 rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh),
+                                                 inputs,
+                                                 sequence_length=sequence_length,
+                                                 dtype=tf.float32)
 
 
+    # Concatenate outputs from fw and bw layer
+    logits = tf.concat(outputs, 2)
+    print("RNN output shape: {}".format(logits.shape))
 
-    """fully connected layer on top"""
 
-    decoded_sequence = tf.contrib.layers.fully_connected(
-        inputs=outputs,
+    # Logits contains the predicted character for every 36 possible frames.
+    logits = tf.contrib.layers.fully_connected(
+        inputs=logits,
         num_outputs=37,  # these are the 36 characters plus the symbol for no character
         activation_fn=tf.identity)
 
+    print("FC shape: {}".format(logits.shape))
+
     """softmax as described in the paper"""
 
-    decoded_sequence = tf.nn.softmax(decoded_sequence, name='final_logits')
+    logits = tf.nn.softmax(logits, name='final_logits')
 
-    return decoded_sequence
+    return logits
