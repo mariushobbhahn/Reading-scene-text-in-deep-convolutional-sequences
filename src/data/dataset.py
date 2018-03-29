@@ -89,7 +89,7 @@ def _sparse_label(labels):
 
         for idx, char in enumerate(label):
             indices.append([batch, idx])
-            values.append(data.utils.char_to_int_label(char) + 1)
+            values.append(data.utils.char_to_int_label(char))
 
     indices = np.asarray(indices)
     values = np.asarray(values)
@@ -123,7 +123,7 @@ class BatchedFeatures(ProxyDataFlow):
             batchlab = _sparse_label(labs)
             seqlen = np.asarray([k.shape[0] for k in feats])
 
-            print("Process label: {}".format(labs[0]))
-            print("Features: {}, label: {}".format(batchfeat.shape, batchlab))
+            # print("Process label: {}".format(labs[0]))
+            # print("Features: {}, label: {}".format(batchfeat.shape, batchlab))
 
             yield [batchfeat, batchlab[0], batchlab[1], batchlab[2], seqlen]
