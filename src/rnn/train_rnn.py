@@ -17,8 +17,9 @@ from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
 
-    def __init__(self, image_size=32):
-        self.image_size = int(image_size)
+    def __init__(self, max_length=30):
+        self.max_length = max_length
+        self.input_vector_size = 128
 
     def _get_inputs(self):
         """
@@ -156,15 +157,14 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 
 
 def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
-    (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
+    data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
     max_length = 0
 
-    for (features, label) in ds_test.get_data():
-        if len(features) > max_length:
-            max_length = len(features)
-            print("Max len: {}".format(max_length))
-
+    # for (features, label) in ds_test.get_data():
+    #     if len(features) > max_length:
+    #         max_length = len(features)
+    #         print("Max len: {}".format(max_length))
 
 
     config = get_config(ds_train, run_inference=True)

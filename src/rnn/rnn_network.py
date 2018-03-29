@@ -34,13 +34,10 @@ def build_rnn(sequence_of_128D_vectors):
     num_LSTMs_per_layer = 128  # as described in the paper
 
     """RNN Cells"""
-    # one cell
-    # TODO what is num_neurons?
-    single_LSTM_cell = rnn.BasicLSTMCell(num_units=num_neurons, activation=tf.nn.tanh)
     # bidirectional LSTM with 128 layers each
     outputs_lstm, states_lstm = rnn.stack_bidirectional_rnn(
-        cells_fw=[single_LSTM_cell for layer in range(num_LSTMs_per_layer)],
-        cells_bw=[single_LSTM_cell for layer in range(num_LSTMs_per_layer)],
+        cells_fw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
+        cells_bw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
         inputs=sequence_of_128D_vectors)
 
     """fully connected layer on top"""
@@ -48,10 +45,10 @@ def build_rnn(sequence_of_128D_vectors):
     decoded_sequence = tf.contrib.layers.fully_connected(
         inputs=outputs_lstm,
         num_outputs=37,  # these are the 36 characters plus the symbol for no character
-        activation_fn=tf.nn.relu)
+        activation_fn=tf.identity)
 
     """softmax as described in the paper"""
 
     decoded_sequence = tf.nn.softmax(decoded_sequence, name='final_logits')
 
-    return(decoded_sequence)
+    return decoded_sequence
