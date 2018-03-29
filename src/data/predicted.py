@@ -31,13 +31,14 @@ class PredictFeatures(DataFlow):
 
             # print("Type: {}".format(f.dtype))
 
-            if num_vectors < 1 or num_vectors > self.list_size:
+            # Ignore data points with less feature vectors than characters.
+            if num_vectors < len(label):
                 continue
 
-            if num_vectors < self.list_size:
-                padding = np.zeros(dtype=np.float32, shape=(self.list_size - num_vectors, 128))
-                # print("Padding shape: {}".format(padding.shape))
-                f = np.append(f, padding, axis=0)
+            # if num_vectors < self.list_size:
+            #     padding = np.zeros(dtype=np.float32, shape=(self.list_size - num_vectors, 128))
+            #     # print("Padding shape: {}".format(padding.shape))
+            #     f = np.append(f, padding, axis=0)
 
             # print("Final shape: {}".format(f.shape))
 

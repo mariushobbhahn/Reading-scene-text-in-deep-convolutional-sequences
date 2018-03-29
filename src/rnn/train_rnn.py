@@ -29,83 +29,116 @@ class TrainRNNModel(ModelDesc):
         self.max_length = max_length
         self.input_vector_size = 128
 
-    def _get_inputs(self):
-        """
-        Define all the inputs (with type, shape, name) that
-        the graph will need.
-        """
+    def inputs(self):
+        return [tf.placeholder(tf.float32, [None, None, 128], 'feat'),  # features
+                tf.placeholder(tf.int64, [None, None], 'labelidx'),  # label is b x maxlen, sparse
+                tf.placeholder(tf.int32, [None], 'labelvalue'),
+                tf.placeholder(tf.int64, [None], 'labelshape'),
+                tf.placeholder(tf.int32, [None], 'seqlen'),  # b
+                ]
 
-        return [InputDesc(tf.float32, (None, 36, 128), 'input'),
-                InputDesc.from_placeholder(tf.sparse_placeholder(tf.int32))]
-                #InputDesc(tf.int32, (None,), 'label')]
 
     def _build_graph(self, inputs):
         """This function should build the model which takes the input variables
         and define self.cost at the end"""
 
         # inputs contains a list of input variables defined above
-        features, label = inputs
+        feat, labelidx, labelvalue, labelshape, seqlen = inputs
 
-        seq_length = length(features)
+        label = tf.SparseTensor(labelidx, labelvalue, labelshape)
+
+        #features, label = inputs
+        #seq_length = length(features)
 
         #build the graph
-        logits = build_rnn(features, seq_length)
+        logits = build_rnn(feat, seqlen)
 
+        # Cost function
+        loss = tf.nn.ctc_loss(label, logits, seqlen, time_major=False)
+        cost = tf.reduce_mean(loss, name='cost')
+
+        # transpose to fit major_time
         logits = tf.transpose(logits, (1, 0, 2))
 
-        """CTC"""
-        print("Logits: {}".format(logits.shape))
-        decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
-                                                           sequence_length=seq_length)  # log prob will not be used afterwards
+        isTrain = get_current_tower_context().is_training
+        if isTrain:
+            # beam search is too slow to run in training
+            predictions = tf.to_int32(
+                tf.nn.ctc_greedy_decoder(logits, seqlen)[0][0])
+        else:
+            predictions = tf.to_int32(
+                tf.nn.ctc_beam_search_decoder(logits, seqlen)[0][0])
 
-        # print("Decoded length: {}".format(len(decoded)))
-
-        # for d in decoded:
-           # print("Indices {}, Values {}, Shape {}, ".format(d.indices, d.values, d.dense_shape))
-
-
-        decoded = decoded[0]
-
-        log_probs = tf.Print(log_probs,
-                             [decoded.indices, decoded.values],
-                             message="Decoded: ")
-
-        # print the predicted labels for the first data point in each step.
-        # out = tf.Print(decoded[0].indices,
-        #                   [tf.argmax(decoded, axis=1, name='prediction')],
-        #                   # [tf.nn.softmax(decoded, name='sm')],
-        #                   summarize=8,
-        #                   message="prediction: ")
-
-        # label = tf.Print(label,
-        #                  [label],
-        #                  summarize=8,
-        #                  message="labels: ")
+        err = tf.edit_distance(predictions, label, normalize=True)
+        err.set_shape([None])
+        err = tf.reduce_mean(err, name='error')
+        summary.add_moving_summary(err, cost)
 
 
-        # a vector of length B with loss of each sample
-        cost = tf.nn.ctc_loss(
-            labels=decoded,
-            inputs=logits,
-            sequence_length=seq_length
-        )
+        print()
 
-        optimizer = self._get_optimizer()
-        cost = optimizer.minimize(cost)
+        #accuracy = tf.reduce_mean(1 - err, name='accuracy')
+        #summary.add_moving_summary(err, accuracy)
 
-        result = tf.argmax(decoded, dimension=1, output_type=tf.int32) #is this the correct output type?
-        correct = tf.cast(tf.equal(result, label), tf.float32, name='correct') #is this the correct output type?
-        accuracy = tf.reduce_mean(correct, name='accuracy')
-
-        # This will monitor training error (in a moving_average fashion):
-        # 1. write the value to tensorboard
-        # 2. write the value to stat.json
-        # 3. print the value after each epoch
-        train_error = tf.reduce_mean(1 - correct, name='train_error')
-        summary.add_moving_summary(train_error, accuracy)
 
         self.cost = tf.identity(cost, name='total_cost')
-        summary.add_moving_summary(cost, self.cost)
+        #summary.add_moving_summary(cost, self.cost)
+
+        return cost
+
+        # """CTC"""
+        # print("Logits: {}".format(logits.shape))
+        # decoded, log_probs = tf.nn.ctc_beam_search_decoder(inputs=logits,
+        #                                                    sequence_length=seqlen)  # log prob will not be used afterwards
+        #
+        # # print("Decoded length: {}".format(len(decoded)))
+        #
+        # # for d in decoded:
+        #    # print("Indices {}, Values {}, Shape {}, ".format(d.indices, d.values, d.dense_shape))
+        #
+        #
+        # decoded = decoded[0]
+        #
+        # log_probs = tf.Print(log_probs,
+        #                      [decoded.indices, decoded.values],
+        #                      message="Decoded: ")
+        #
+        # # print the predicted labels for the first data point in each step.
+        # # out = tf.Print(decoded[0].indices,
+        # #                   [tf.argmax(decoded, axis=1, name='prediction')],
+        # #                   # [tf.nn.softmax(decoded, name='sm')],
+        # #                   summarize=8,
+        # #                   message="prediction: ")
+        #
+        # # label = tf.Print(label,
+        # #                  [label],
+        # #                  summarize=8,
+        # #                  message="labels: ")
+        #
+        #
+        # # a vector of length B with loss of each sample
+        # # cost = tf.nn.ctc_loss(
+        # #     labels=decoded,
+        # #     inputs=logits,
+        # #     sequence_length=seqlen
+        # # )
+        #
+        # optimizer = self._get_optimizer()
+        # cost = optimizer.minimize(cost)
+        #
+        # result = tf.argmax(decoded, dimension=1, output_type=tf.int32) #is this the correct output type?
+        # correct = tf.cast(tf.equal(result, label), tf.float32, name='correct') #is this the correct output type?
+        # accuracy = tf.reduce_mean(correct, name='accuracy')
+        #
+        # # This will monitor training error (in a moving_average fashion):
+        # # 1. write the value to tensorboard
+        # # 2. write the value to stat.json
+        # # 3. print the value after each epoch
+        # train_error = tf.reduce_mean(1 - correct, name='train_error')
+        # summary.add_moving_summary(train_error, accuracy)
+        #
+        # self.cost = tf.identity(cost, name='total_cost')
+        # summary.add_moving_summary(cost, self.cost)
 
     def _get_optimizer(self):
         #we use the adam optimizer for simplicity
@@ -136,7 +169,7 @@ def get_config(data, max_epoch=1500, run_inference=True):
         callbacks.append(
             InferenceRunner(    # run inference(for validation) after every epoch
                 dataset_test,   # the DataFlow instance used for validation
-                ScalarStats(['cross_entropy_loss', 'accuracy'])))
+                ScalarStats(['total_cost', 'error'])))
 
     # get the config which contains everything necessary in a training
     return TrainConfig(
@@ -152,6 +185,17 @@ def get_config(data, max_epoch=1500, run_inference=True):
 def get_data(model, step_size, unique, sub_data, batch_size):
     ds_train = data.utils.load_lmdb(IIIT5K('train', unique=unique))
     ds_test = data.utils.load_lmdb(IIIT5K('test', unique=unique))
+
+    predictor = CharacterPredictor(model)
+
+    ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
+    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
+
+    ds_train.name = "IIIT5K_train_features_{}".format(step_size)
+    ds_test.name = "IIIT5K_test_features_{}".format(step_size)
+
+    ds_train = data.utils.load_lmdb(ds_train)
+    ds_test = data.utils.load_lmdb(ds_test)
 
     if unique:
         print("Use one data point per label")
@@ -173,15 +217,13 @@ def get_data(model, step_size, unique, sub_data, batch_size):
     #ds_train = BatchData(ds_train, batch_size)
     #ds_test = BatchData(ds_test, 2 * batch_size, remainder=True)
 
-    predictor = CharacterPredictor(model)
-
-    ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
-    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
+    ds_train = BatchedFeatures(ds_train, batch_size)
+    ds_test = BatchedFeatures(ds_test, batch_size)
 
     return ds_train, ds_test
 
 
-def train_rnn(model, step_size=16, unique=False, sub_data=None, batch_size=None):
+def train_rnn(model, step_size, unique, sub_data, batch_size):
 
     # automatically setup the directory for logging
     logger.set_logger_dir(cfg.TRAIN_LOG_DIR)

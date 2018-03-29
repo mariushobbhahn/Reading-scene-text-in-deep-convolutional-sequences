@@ -44,12 +44,12 @@ def main(argv):
     if args.test:
         test(args.test, model)
     elif args.train_rnn:
-        step_size = args.step_size if args.step_size else 16
+        step_size = args.step_size if args.step_size else 8
         train_rnn(model,
                   step_size,
                   unique=args.unique or False,
                   sub_data=int(args.sub_data) if args.sub_data else None,
-                  batch_size=int(args.batch_size) if args.batch_size else 128)
+                  batch_size=int(args.batch_size) if args.batch_size else 1)
     else:
         # start training
         train(unique=args.unique or False,
