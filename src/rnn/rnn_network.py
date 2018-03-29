@@ -26,25 +26,26 @@ The output of the LSTM is then given into the CTC. (This happens in the train cl
 """RNN: 128LSTM_cells per layer, fully connected 37 neuron layer in the end"""
 
 
-def build_rnn(inputs):
+def build_rnn(input):
     """Constants:"""
     # TODO lenght not known at this point
     # seq_length = len(sequence_of_128D_vectors)
 
     num_lstm = 128  # as described in the paper
 
-    lstm_inputs = tf.contrib.layers.fully_connected(inputs=inputs, num_outputs=128)
+    lstm_inputs = tf.contrib.layers.fully_connected(inputs=input, num_outputs=128)
     """RNN Cells"""
     # bidirectional LSTM with 128 layers each
     outputs_lstm, states_lstm = rnn.stack_bidirectional_rnn(
         cells_fw=[rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh, name='lstm_forward')],
         cells_bw=[rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh, name='lstm_backward')],
-        inputs=inputs)
+        inputs=inputs,
+        dtype=tf.float32)
 
     """fully connected layer on top"""
 
     decoded_sequence = tf.contrib.layers.fully_connected(
-        inputs=outputs_lstm,
+        inputs=outputs,
         num_outputs=37,  # these are the 36 characters plus the symbol for no character
         activation_fn=tf.identity)
 
