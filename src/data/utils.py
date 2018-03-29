@@ -50,7 +50,7 @@ def load_lmdb(named_df):
     :return: A LMDBDataFlow which contains the same data points as the named df.
     """
     # The path where the .mdb file should be located
-    mdb_file = os.path.join(config.DATA_DIR, named_df.get_name() + ".mdb")
+    mdb_file = os.path.join(config.DATA_DIR, named_df.name + ".mdb")
 
     # remove old file to force recreation
     if config.REMOVE_LMDB and os.path.exists(mdb_file):

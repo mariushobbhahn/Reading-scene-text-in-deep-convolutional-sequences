@@ -2,10 +2,10 @@ import os.path
 import scipy.io as sp
 
 from data.utils import *
-from data.dataset import NamedDataFlow
+from tensorpack.dataflow.base import DataFlow
 
 
-class IIIT5K(NamedDataFlow):
+class IIIT5K(DataFlow):
     """
       Base class for a DataFlow from the IIIT5K data set.
       Will return (image, label) data points, where image will be a grayscale image with height of 32px.
@@ -13,22 +13,25 @@ class IIIT5K(NamedDataFlow):
 
     _cached_file = None
 
-    def __init__(self, train_or_test, data_dir=None, unique=False, name="IIIT5K"):
+    def __init__(self, train_or_test, data_dir=None, unique=False):
+
+        name = "IIIT5K"
+
         if data_dir is None:
             data_dir = os.path.join(config.DATA_DIR, name)
 
         self.train_or_test = train_or_test
         self.data_dir = data_dir
         self.unique = unique
-        super(IIIT5K, self).__init__(name)
+
+        super(IIIT5K, self).__init__()
+
+        self.name = name + "_" + self.train_or_test
 
     def size(self):
         if (self.unique):
             return 36
         return sum(1 for _ in self._get_mat_file())
-
-    def get_name(self):
-        return self._name + "_" + self.train_or_test
 
     def _get_mat_file(self):
         """
@@ -97,11 +100,10 @@ class IIIT5KChar(IIIT5K):
       Returns (image, label) data points, where label is an integer between 0 and 35 and image a 32x32 grayscale image.
     """
 
-    def __init__(self, train_or_test, data_dir=None, unique=False, name="IIIT5K"):
-        super(IIIT5KChar, self).__init__(train_or_test=train_or_test, data_dir=data_dir, unique=unique, name=name)
+    def __init__(self, train_or_test, data_dir=None, unique=False):
+        super(IIIT5KChar, self).__init__(train_or_test=train_or_test, data_dir=data_dir, unique=unique)
 
-    def get_name(self):
-        return self._name + "_char_" + self.train_or_test
+        self.name = "IIIT5K_char_" + self.train_or_test
 
     def get_data(self):
         known_labels = set()

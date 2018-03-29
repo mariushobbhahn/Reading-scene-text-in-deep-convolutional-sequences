@@ -5,27 +5,6 @@ from tensorpack.dataflow.base import DataFlow
 from tensorpack.dataflow.dftools import dump_dataflow_to_lmdb
 
 
-class NamedDataFlow(DataFlow):
-    """
-        Subclass of DataFlow which has a unique name
-    """
-    def __init__(self, name):
-        self._name = name
-
-    def size(self):
-        pass
-
-    def get_data(self):
-        pass
-
-    def get_name(self):
-        """
-        Returns the name of this data set. The name can depend on the train or test config.
-        :return:
-        """
-        return self._name
-
-
 class SubData(DataFlow):
     """
         DataFlow wrapper which only contains a subset of the wrapped data points.
