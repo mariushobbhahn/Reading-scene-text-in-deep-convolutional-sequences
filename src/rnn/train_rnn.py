@@ -16,9 +16,9 @@ from data.predicted import PredictFeatures
 from rnn.rnn_network import *
 
 class TrainRNNModel(ModelDesc):
-
-    def __init__(self, image_size=32):
-        self.image_size = int(image_size)
+    def __init__(self, max_length=30):
+        self.max_length = max_length
+        self.input_vector_size = 128
 
     def _get_inputs(self):
         """
