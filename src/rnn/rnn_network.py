@@ -3,7 +3,7 @@ from tensorpack import *
 import tensorflow as tf
 import numpy as np
 
-rnn = tf.contrib.rnn
+import tensorflow.contrib.rnn as rnn
 
 """
 Explanation:
@@ -28,11 +28,14 @@ The output of the LSTM is then given into the CTC. (This happens in the train cl
 
 def build_rnn(sequence_of_128D_vectors):
     """Constants:"""
-    seq_length = len(sequence_of_128D_vectors)
+    # TODO lenght not known at this point
+    # seq_length = len(sequence_of_128D_vectors)
+
     num_LSTMs_per_layer = 128  # as described in the paper
 
     """RNN Cells"""
     # one cell
+    # TODO what is num_neurons?
     single_LSTM_cell = rnn.BasicLSTMCell(num_units=num_neurons, activation=tf.nn.tanh)
     # bidirectional LSTM with 128 layers each
     outputs_lstm, states_lstm = rnn.stack_bidirectional_rnn(
