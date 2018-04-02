@@ -1,0 +1,495 @@
+[32m[0402 16:38:31 @logger.py:74][0m Argv: main.py --train-rnn
+[32m[0402 16:38:31 @format.py:91][0m Found 2000 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_train.mdb
+[32m[0402 16:38:31 @format.py:91][0m Found 3000 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_test.mdb
+[32m[0402 16:38:31 @registry.py:121][0m conv0 input: [None, 32, 32, 1]
+[32m[0402 16:38:31 @registry.py:129][0m conv0 output: [None, 24, 24, 96]
+[32m[0402 16:38:31 @registry.py:121][0m conv1 input: [None, 24, 24, 48]
+[32m[0402 16:38:31 @registry.py:129][0m conv1 output: [None, 16, 16, 128]
+[32m[0402 16:38:31 @registry.py:121][0m conv2 input: [None, 16, 16, 64]
+[32m[0402 16:38:31 @registry.py:129][0m conv2 output: [None, 8, 8, 256]
+[32m[0402 16:38:31 @registry.py:121][0m conv3 input: [None, 8, 8, 128]
+[32m[0402 16:38:31 @registry.py:129][0m conv3 output: [None, 1, 1, 512]
+[32m[0402 16:38:31 @registry.py:121][0m conv4 input: [None, 1, 1, 128]
+[32m[0402 16:38:31 @registry.py:129][0m conv4 output: [None, 1, 1, 144]
+[32m[0402 16:38:31 @registry.py:121][0m fc input: [None, 1, 1, 36]
+[32m[0402 16:38:31 @registry.py:129][0m fc output: [None, 36]
+[32m[0402 16:38:31 @sessinit.py:90][0m [5m[31mWRN[0m The following variables are in the checkpoint, but not found in the graph: beta1_power:0, beta2_power:0, global_step:0
+[32m[0402 16:38:31 @sessinit.py:117][0m Restoring checkpoint from /graphics/scratch/student_datasets/cgpraktikum17/deep-sequences/project/res/cnn_model/max-validation_accuracy ...
+[32m[0402 16:38:31 @format.py:91][0m Found 1766 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_train_features_8.mdb
+[32m[0402 16:38:31 @format.py:91][0m Found 2545 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_test_features_8.mdb
+[32m[0402 16:38:32 @trainers.py:52][0m Building graph for a single training tower ...
+[32m[0402 16:38:32 @model_utils.py:49][0m [36mTrainable Variables: 
+[0mname                                           shape          dim
+---------------------------------------------  ----------  ------
+bidirectional_rnn/fw/basic_lstm_cell/kernel:0  [256, 512]  131072
+bidirectional_rnn/fw/basic_lstm_cell/bias:0    [512]          512
+bidirectional_rnn/bw/basic_lstm_cell/kernel:0  [256, 512]  131072
+bidirectional_rnn/bw/basic_lstm_cell/bias:0    [512]          512
+fully_connected/weights:0                      [256, 37]     9472
+fully_connected/biases:0                       [37]            37[36m
+Total #vars=6, #params=272677, size=1.04MB[0m
+[32m[0402 16:38:32 @base.py:209][0m Setup callbacks graph ...
+[32m[0402 16:38:32 @predict.py:42][0m Building predictor tower 'InferenceTower' on device /gpu:0 ...
+[32m[0402 16:38:33 @summary.py:35][0m Maintain moving average summary of 3 tensors in collection MOVING_SUMMARY_OPS.
+[32m[0402 16:38:33 @summary.py:72][0m Summarizing collection 'summaries' of size 3.
+[32m[0402 16:38:33 @base.py:227][0m Creating the session ...
+[32m[0402 16:38:33 @base.py:235][0m Initializing the session ...
+[32m[0402 16:38:33 @base.py:242][0m Graph Finalized.
+[32m[0402 16:38:33 @inference_runner.py:97][0m InferenceRunner will eval 1766 iterations
+[32m[0402 16:38:33 @monitor.py:311][0m [5m[31mWRN[0m History epoch value 116 from JSON is not the predecessor of the starting_epoch value 1
+[32m[0402 16:38:33 @monitor.py:312][0m [5m[31mWRN[0m If you want to resume old training, either use `AutoResumeTrainConfig` or correctly set the starting_epoch yourself to avoid inconsistency. Epoch number will not be automatically loaded by JSONWriter.
+[32m[0402 16:38:33 @monitor.py:320][0m [5m[31mWRN[0m Now, we will start training at epoch 1 and backup old json to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/stats.json.0402-163833
+[32m[0402 16:38:33 @base.py:262][0m Start Epoch 1 ...
+[32m[0402 16:38:47 @base.py:272][0m Epoch 1 (global_step 2545) finished, time:13.7 seconds.
+[32m[0402 16:38:48 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-2545.
+[32m[0402 16:38:56 @monitor.py:428][0m accuracy: 0.095256
+[32m[0402 16:38:56 @monitor.py:428][0m cost: nan
+[32m[0402 16:38:56 @monitor.py:428][0m error: 0.90474
+[32m[0402 16:38:56 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:38:56 @monitor.py:428][0m validation_error: 0.74324
+[32m[0402 16:38:56 @group.py:44][0m Callbacks took 8.862 sec in total. InferenceRunner: 7.95 seconds
+[32m[0402 16:38:56 @base.py:262][0m Start Epoch 2 ...
+[32m[0402 16:39:10 @base.py:272][0m Epoch 2 (global_step 5090) finished, time:14.6 seconds.
+[32m[0402 16:39:10 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-5090.
+[32m[0402 16:39:18 @monitor.py:428][0m accuracy: 0.30803
+[32m[0402 16:39:18 @monitor.py:428][0m cost: nan
+[32m[0402 16:39:18 @monitor.py:428][0m error: 0.69197
+[32m[0402 16:39:18 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:39:18 @monitor.py:428][0m validation_error: 0.55555
+[32m[0402 16:39:18 @group.py:44][0m Callbacks took 7.261 sec in total. InferenceRunner: 7.22 seconds
+[32m[0402 16:39:18 @base.py:262][0m Start Epoch 3 ...
+[32m[0402 16:39:33 @base.py:272][0m Epoch 3 (global_step 7635) finished, time:15 seconds.
+[32m[0402 16:39:33 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-7635.
+[32m[0402 16:39:41 @monitor.py:428][0m accuracy: 0.46677
+[32m[0402 16:39:41 @monitor.py:428][0m cost: nan
+[32m[0402 16:39:41 @monitor.py:428][0m error: 0.53323
+[32m[0402 16:39:41 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:39:41 @monitor.py:428][0m validation_error: 0.45587
+[32m[0402 16:39:41 @group.py:44][0m Callbacks took 8.943 sec in total. InferenceRunner: 8.9 seconds
+[32m[0402 16:39:41 @base.py:262][0m Start Epoch 4 ...
+[32m[0402 16:39:55 @base.py:272][0m Epoch 4 (global_step 10180) finished, time:13.3 seconds.
+[32m[0402 16:39:55 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-10180.
+[32m[0402 16:40:03 @monitor.py:428][0m accuracy: 0.511
+[32m[0402 16:40:03 @monitor.py:428][0m cost: nan
+[32m[0402 16:40:03 @monitor.py:428][0m error: 0.489
+[32m[0402 16:40:03 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:40:03 @monitor.py:428][0m validation_error: 0.4042
+[32m[0402 16:40:03 @group.py:44][0m Callbacks took 8.327 sec in total. InferenceRunner: 8.09 seconds
+[32m[0402 16:40:03 @base.py:262][0m Start Epoch 5 ...
+[32m[0402 16:40:19 @base.py:272][0m Epoch 5 (global_step 12725) finished, time:15.9 seconds.
+[32m[0402 16:40:19 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-12725.
+[32m[0402 16:40:27 @monitor.py:428][0m accuracy: 0.5432
+[32m[0402 16:40:27 @monitor.py:428][0m cost: nan
+[32m[0402 16:40:27 @monitor.py:428][0m error: 0.4568
+[32m[0402 16:40:27 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:40:27 @monitor.py:428][0m validation_error: 0.37298
+[32m[0402 16:40:27 @group.py:44][0m Callbacks took 8.433 sec in total. InferenceRunner: 8.38 seconds
+[32m[0402 16:40:27 @base.py:262][0m Start Epoch 6 ...
+[32m[0402 16:40:41 @base.py:272][0m Epoch 6 (global_step 15270) finished, time:13.2 seconds.
+[32m[0402 16:40:41 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-15270.
+[32m[0402 16:40:51 @monitor.py:428][0m accuracy: 0.56567
+[32m[0402 16:40:51 @monitor.py:428][0m cost: nan
+[32m[0402 16:40:51 @monitor.py:428][0m error: 0.43433
+[32m[0402 16:40:51 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:40:51 @monitor.py:428][0m validation_error: 0.35143
+[32m[0402 16:40:51 @group.py:44][0m Callbacks took 9.862 sec in total. InferenceRunner: 9.82 seconds
+[32m[0402 16:40:51 @base.py:262][0m Start Epoch 7 ...
+[32m[0402 16:41:05 @base.py:272][0m Epoch 7 (global_step 17815) finished, time:14.6 seconds.
+[32m[0402 16:41:05 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-17815.
+[32m[0402 16:41:13 @monitor.py:428][0m accuracy: 0.58781
+[32m[0402 16:41:13 @monitor.py:428][0m cost: nan
+[32m[0402 16:41:13 @monitor.py:428][0m error: 0.41219
+[32m[0402 16:41:13 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:41:13 @monitor.py:428][0m validation_error: 0.33805
+[32m[0402 16:41:13 @group.py:44][0m Callbacks took 8.136 sec in total. InferenceRunner: 8.09 seconds
+[32m[0402 16:41:13 @base.py:262][0m Start Epoch 8 ...
+[32m[0402 16:41:28 @base.py:272][0m Epoch 8 (global_step 20360) finished, time:15.1 seconds.
+[32m[0402 16:41:28 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-20360.
+[32m[0402 16:41:38 @monitor.py:428][0m accuracy: 0.6305
+[32m[0402 16:41:38 @monitor.py:428][0m cost: nan
+[32m[0402 16:41:38 @monitor.py:428][0m error: 0.3695
+[32m[0402 16:41:38 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:41:38 @monitor.py:428][0m validation_error: 0.32855
+[32m[0402 16:41:38 @group.py:44][0m Callbacks took 9.447 sec in total. InferenceRunner: 9.4 seconds
+[32m[0402 16:41:38 @base.py:262][0m Start Epoch 9 ...
+[32m[0402 16:41:51 @base.py:272][0m Epoch 9 (global_step 22905) finished, time:13.2 seconds.
+[32m[0402 16:41:51 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-22905.
+[32m[0402 16:42:03 @monitor.py:428][0m accuracy: 0.65126
+[32m[0402 16:42:03 @monitor.py:428][0m cost: nan
+[32m[0402 16:42:03 @monitor.py:428][0m error: 0.34874
+[32m[0402 16:42:03 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:42:03 @monitor.py:428][0m validation_error: 0.32145
+[32m[0402 16:42:03 @group.py:44][0m Callbacks took 12.410 sec in total. InferenceRunner: 8.85 seconds
+[32m[0402 16:42:03 @base.py:262][0m Start Epoch 10 ...
+[32m[0402 16:42:18 @base.py:272][0m Epoch 10 (global_step 25450) finished, time:14.9 seconds.
+[32m[0402 16:42:18 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-25450.
+[32m[0402 16:42:27 @monitor.py:428][0m accuracy: 0.68051
+[32m[0402 16:42:27 @monitor.py:428][0m cost: nan
+[32m[0402 16:42:27 @monitor.py:428][0m error: 0.31949
+[32m[0402 16:42:27 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:42:27 @monitor.py:428][0m validation_error: 0.31932
+[32m[0402 16:42:27 @group.py:44][0m Callbacks took 8.218 sec in total. InferenceRunner: 8.18 seconds
+[32m[0402 16:42:27 @base.py:262][0m Start Epoch 11 ...
+[32m[0402 16:42:41 @base.py:272][0m Epoch 11 (global_step 27995) finished, time:14.9 seconds.
+[32m[0402 16:42:41 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-27995.
+[32m[0402 16:42:51 @monitor.py:428][0m accuracy: 0.69595
+[32m[0402 16:42:51 @monitor.py:428][0m cost: nan
+[32m[0402 16:42:51 @monitor.py:428][0m error: 0.30405
+[32m[0402 16:42:51 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:42:51 @monitor.py:428][0m validation_error: 0.3149
+[32m[0402 16:42:51 @group.py:44][0m Callbacks took 9.653 sec in total. InferenceRunner: 9.6 seconds
+[32m[0402 16:42:51 @base.py:262][0m Start Epoch 12 ...
+[32m[0402 16:43:04 @base.py:272][0m Epoch 12 (global_step 30540) finished, time:13.4 seconds.
+[32m[0402 16:43:05 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-30540.
+[32m[0402 16:43:13 @monitor.py:428][0m accuracy: 0.70085
+[32m[0402 16:43:13 @monitor.py:428][0m cost: nan
+[32m[0402 16:43:13 @monitor.py:428][0m error: 0.29915
+[32m[0402 16:43:13 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:43:13 @monitor.py:428][0m validation_error: 0.31481
+[32m[0402 16:43:13 @group.py:44][0m Callbacks took 8.682 sec in total. InferenceRunner: 8.63 seconds
+[32m[0402 16:43:13 @base.py:262][0m Start Epoch 13 ...
+[32m[0402 16:43:29 @base.py:272][0m Epoch 13 (global_step 33085) finished, time:15.7 seconds.
+[32m[0402 16:43:29 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-33085.
+[32m[0402 16:43:38 @monitor.py:428][0m accuracy: 0.74814
+[32m[0402 16:43:38 @monitor.py:428][0m cost: nan
+[32m[0402 16:43:38 @monitor.py:428][0m error: 0.25186
+[32m[0402 16:43:38 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:43:38 @monitor.py:428][0m validation_error: 0.31326
+[32m[0402 16:43:38 @group.py:44][0m Callbacks took 8.696 sec in total. InferenceRunner: 8.64 seconds
+[32m[0402 16:43:38 @base.py:262][0m Start Epoch 14 ...
+[32m[0402 16:43:51 @base.py:272][0m Epoch 14 (global_step 35630) finished, time:13.4 seconds.
+[32m[0402 16:43:51 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-35630.
+[32m[0402 16:44:01 @monitor.py:428][0m accuracy: 0.75881
+[32m[0402 16:44:01 @monitor.py:428][0m cost: nan
+[32m[0402 16:44:01 @monitor.py:428][0m error: 0.24119
+[32m[0402 16:44:01 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:44:01 @monitor.py:428][0m validation_error: 0.31038
+[32m[0402 16:44:01 @group.py:44][0m Callbacks took 10.009 sec in total. InferenceRunner: 9.96 seconds
+[32m[0402 16:44:01 @base.py:262][0m Start Epoch 15 ...
+[32m[0402 16:44:15 @base.py:272][0m Epoch 15 (global_step 38175) finished, time:14.4 seconds.
+[32m[0402 16:44:15 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-38175.
+[32m[0402 16:44:26 @monitor.py:428][0m accuracy: 0.76534
+[32m[0402 16:44:26 @monitor.py:428][0m cost: nan
+[32m[0402 16:44:26 @monitor.py:428][0m error: 0.23466
+[32m[0402 16:44:26 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:44:26 @monitor.py:428][0m validation_error: 0.30929
+[32m[0402 16:44:26 @group.py:44][0m Callbacks took 11.094 sec in total. InferenceRunner: 8.35 seconds
+[32m[0402 16:44:26 @base.py:262][0m Start Epoch 16 ...
+[32m[0402 16:44:42 @base.py:272][0m Epoch 16 (global_step 40720) finished, time:15.8 seconds.
+[32m[0402 16:44:42 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-40720.
+[32m[0402 16:44:51 @monitor.py:428][0m accuracy: 0.81776
+[32m[0402 16:44:51 @monitor.py:428][0m cost: nan
+[32m[0402 16:44:51 @monitor.py:428][0m error: 0.18224
+[32m[0402 16:44:51 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:44:51 @monitor.py:428][0m validation_error: 0.31027
+[32m[0402 16:44:51 @group.py:44][0m Callbacks took 9.105 sec in total. InferenceRunner: 9.04 seconds
+[32m[0402 16:44:51 @base.py:262][0m Start Epoch 17 ...
+[32m[0402 16:45:05 @base.py:272][0m Epoch 17 (global_step 43265) finished, time:13.2 seconds.
+[32m[0402 16:45:05 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-43265.
+[32m[0402 16:45:15 @monitor.py:428][0m accuracy: 0.83522
+[32m[0402 16:45:15 @monitor.py:428][0m cost: nan
+[32m[0402 16:45:15 @monitor.py:428][0m error: 0.16478
+[32m[0402 16:45:15 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:45:15 @monitor.py:428][0m validation_error: 0.31394
+[32m[0402 16:45:15 @group.py:44][0m Callbacks took 10.938 sec in total. InferenceRunner: 10.1 seconds
+[32m[0402 16:45:15 @base.py:262][0m Start Epoch 18 ...
+[32m[0402 16:45:30 @base.py:272][0m Epoch 18 (global_step 45810) finished, time:14.5 seconds.
+[32m[0402 16:45:30 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-45810.
+[32m[0402 16:45:38 @monitor.py:428][0m accuracy: 0.86393
+[32m[0402 16:45:38 @monitor.py:428][0m cost: nan
+[32m[0402 16:45:38 @monitor.py:428][0m error: 0.13607
+[32m[0402 16:45:38 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:45:38 @monitor.py:428][0m validation_error: 0.31158
+[32m[0402 16:45:38 @group.py:44][0m Callbacks took 8.427 sec in total. InferenceRunner: 8.38 seconds
+[32m[0402 16:45:38 @base.py:262][0m Start Epoch 19 ...
+[32m[0402 16:45:54 @base.py:272][0m Epoch 19 (global_step 48355) finished, time:15.2 seconds.
+[32m[0402 16:45:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-48355.
+[32m[0402 16:46:03 @monitor.py:428][0m accuracy: 0.87733
+[32m[0402 16:46:03 @monitor.py:428][0m cost: nan
+[32m[0402 16:46:03 @monitor.py:428][0m error: 0.12267
+[32m[0402 16:46:03 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:46:03 @monitor.py:428][0m validation_error: 0.31297
+[32m[0402 16:46:03 @group.py:44][0m Callbacks took 9.788 sec in total. InferenceRunner: 9.59 seconds
+[32m[0402 16:46:03 @base.py:262][0m Start Epoch 20 ...
+[32m[0402 16:46:17 @base.py:272][0m Epoch 20 (global_step 50900) finished, time:13.2 seconds.
+[32m[0402 16:46:19 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-50900.
+[32m[0402 16:46:30 @monitor.py:428][0m accuracy: 0.88933
+[32m[0402 16:46:30 @monitor.py:428][0m cost: nan
+[32m[0402 16:46:30 @monitor.py:428][0m error: 0.11067
+[32m[0402 16:46:30 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:46:30 @monitor.py:428][0m validation_error: 0.31325
+[32m[0402 16:46:30 @group.py:44][0m Callbacks took 12.920 sec in total. InferenceRunner: 10.1 seconds
+[32m[0402 16:46:30 @base.py:262][0m Start Epoch 21 ...
+[32m[0402 16:46:44 @base.py:272][0m Epoch 21 (global_step 53445) finished, time:14.7 seconds.
+[32m[0402 16:46:44 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-53445.
+[32m[0402 16:46:56 @monitor.py:428][0m accuracy: 0.90573
+[32m[0402 16:46:56 @monitor.py:428][0m cost: nan
+[32m[0402 16:46:56 @monitor.py:428][0m error: 0.094273
+[32m[0402 16:46:56 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:46:56 @monitor.py:428][0m validation_error: 0.31567
+[32m[0402 16:46:56 @group.py:44][0m Callbacks took 11.555 sec in total. InferenceRunner: 8.39 seconds
+[32m[0402 16:46:56 @base.py:262][0m Start Epoch 22 ...
+[32m[0402 16:47:12 @base.py:272][0m Epoch 22 (global_step 55990) finished, time:15.8 seconds.
+[32m[0402 16:47:12 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-55990.
+[32m[0402 16:47:21 @monitor.py:428][0m accuracy: 0.90891
+[32m[0402 16:47:21 @monitor.py:428][0m cost: nan
+[32m[0402 16:47:21 @monitor.py:428][0m error: 0.091094
+[32m[0402 16:47:21 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:47:21 @monitor.py:428][0m validation_error: 0.31611
+[32m[0402 16:47:21 @group.py:44][0m Callbacks took 9.123 sec in total. InferenceRunner: 9.07 seconds
+[32m[0402 16:47:21 @base.py:262][0m Start Epoch 23 ...
+[32m[0402 16:47:34 @base.py:272][0m Epoch 23 (global_step 58535) finished, time:13.2 seconds.
+[32m[0402 16:47:34 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-58535.
+[32m[0402 16:47:44 @monitor.py:428][0m accuracy: 0.91264
+[32m[0402 16:47:44 @monitor.py:428][0m cost: nan
+[32m[0402 16:47:44 @monitor.py:428][0m error: 0.087364
+[32m[0402 16:47:44 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:47:44 @monitor.py:428][0m validation_error: 0.31679
+[32m[0402 16:47:44 @group.py:44][0m Callbacks took 10.239 sec in total. InferenceRunner: 10 seconds
+[32m[0402 16:47:44 @base.py:262][0m Start Epoch 24 ...
+[32m[0402 16:47:59 @base.py:272][0m Epoch 24 (global_step 61080) finished, time:14.8 seconds.
+[32m[0402 16:47:59 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-61080.
+[32m[0402 16:48:10 @monitor.py:428][0m accuracy: 0.92903
+[32m[0402 16:48:10 @monitor.py:428][0m cost: nan
+[32m[0402 16:48:10 @monitor.py:428][0m error: 0.070972
+[32m[0402 16:48:10 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:48:10 @monitor.py:428][0m validation_error: 0.31817
+[32m[0402 16:48:10 @group.py:44][0m Callbacks took 11.067 sec in total. InferenceRunner: 8.38 seconds
+[32m[0402 16:48:10 @base.py:262][0m Start Epoch 25 ...
+[32m[0402 16:48:26 @base.py:272][0m Epoch 25 (global_step 63625) finished, time:15.6 seconds.
+[32m[0402 16:48:26 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-63625.
+[32m[0402 16:48:35 @monitor.py:428][0m accuracy: 0.93386
+[32m[0402 16:48:35 @monitor.py:428][0m cost: nan
+[32m[0402 16:48:35 @monitor.py:428][0m error: 0.066143
+[32m[0402 16:48:35 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:48:35 @monitor.py:428][0m validation_error: 0.31846
+[32m[0402 16:48:35 @group.py:44][0m Callbacks took 9.378 sec in total. InferenceRunner: 9.32 seconds
+[32m[0402 16:48:35 @base.py:262][0m Start Epoch 26 ...
+[32m[0402 16:48:48 @base.py:272][0m Epoch 26 (global_step 66170) finished, time:13.3 seconds.
+[32m[0402 16:48:48 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-66170.
+[32m[0402 16:48:58 @monitor.py:428][0m accuracy: 0.94556
+[32m[0402 16:48:58 @monitor.py:428][0m cost: nan
+[32m[0402 16:48:58 @monitor.py:428][0m error: 0.054443
+[32m[0402 16:48:58 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:48:58 @monitor.py:428][0m validation_error: 0.32082
+[32m[0402 16:48:58 @group.py:44][0m Callbacks took 9.946 sec in total. InferenceRunner: 9.89 seconds
+[32m[0402 16:48:58 @base.py:262][0m Start Epoch 27 ...
+[32m[0402 16:49:13 @base.py:272][0m Epoch 27 (global_step 68715) finished, time:14.9 seconds.
+[32m[0402 16:49:13 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-68715.
+[32m[0402 16:49:24 @monitor.py:428][0m accuracy: 0.94824
+[32m[0402 16:49:24 @monitor.py:428][0m cost: nan
+[32m[0402 16:49:24 @monitor.py:428][0m error: 0.051762
+[32m[0402 16:49:24 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:49:24 @monitor.py:428][0m validation_error: 0.32383
+[32m[0402 16:49:24 @group.py:44][0m Callbacks took 10.505 sec in total. InferenceRunner: 8.37 seconds
+[32m[0402 16:49:24 @base.py:262][0m Start Epoch 28 ...
+[32m[0402 16:49:39 @base.py:272][0m Epoch 28 (global_step 71260) finished, time:15.3 seconds.
+[32m[0402 16:49:39 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-71260.
+[32m[0402 16:49:48 @monitor.py:428][0m accuracy: 0.95835
+[32m[0402 16:49:48 @monitor.py:428][0m cost: nan
+[32m[0402 16:49:48 @monitor.py:428][0m error: 0.041652
+[32m[0402 16:49:48 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:49:48 @monitor.py:428][0m validation_error: 0.32599
+[32m[0402 16:49:48 @group.py:44][0m Callbacks took 9.592 sec in total. InferenceRunner: 9.54 seconds
+[32m[0402 16:49:48 @base.py:262][0m Start Epoch 29 ...
+[32m[0402 16:50:02 @base.py:272][0m Epoch 29 (global_step 73805) finished, time:13.2 seconds.
+[32m[0402 16:50:02 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-73805.
+[32m[0402 16:50:11 @monitor.py:428][0m accuracy: 0.97007
+[32m[0402 16:50:11 @monitor.py:428][0m cost: nan
+[32m[0402 16:50:11 @monitor.py:428][0m error: 0.029926
+[32m[0402 16:50:11 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:50:11 @monitor.py:428][0m validation_error: 0.32574
+[32m[0402 16:50:11 @group.py:44][0m Callbacks took 9.310 sec in total. InferenceRunner: 9.26 seconds
+[32m[0402 16:50:11 @base.py:262][0m Start Epoch 30 ...
+[32m[0402 16:50:27 @base.py:272][0m Epoch 30 (global_step 76350) finished, time:15.7 seconds.
+[32m[0402 16:50:27 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-76350.
+[32m[0402 16:50:38 @monitor.py:428][0m accuracy: 0.97698
+[32m[0402 16:50:38 @monitor.py:428][0m cost: nan
+[32m[0402 16:50:38 @monitor.py:428][0m error: 0.023021
+[32m[0402 16:50:38 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:50:38 @monitor.py:428][0m validation_error: 0.32706
+[32m[0402 16:50:38 @group.py:44][0m Callbacks took 11.278 sec in total. InferenceRunner: 8.37 seconds
+[32m[0402 16:50:38 @base.py:262][0m Start Epoch 31 ...
+[32m[0402 16:50:53 @base.py:272][0m Epoch 31 (global_step 78895) finished, time:15.1 seconds.
+[32m[0402 16:50:53 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-78895.
+[32m[0402 16:51:03 @monitor.py:428][0m accuracy: 0.99246
+[32m[0402 16:51:03 @monitor.py:428][0m cost: nan
+[32m[0402 16:51:03 @monitor.py:428][0m error: 0.0075408
+[32m[0402 16:51:03 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:51:03 @monitor.py:428][0m validation_error: 0.32859
+[32m[0402 16:51:03 @group.py:44][0m Callbacks took 9.814 sec in total. InferenceRunner: 9.76 seconds
+[32m[0402 16:51:03 @base.py:262][0m Start Epoch 32 ...
+[32m[0402 16:51:16 @base.py:272][0m Epoch 32 (global_step 81440) finished, time:13.2 seconds.
+[32m[0402 16:51:16 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-81440.
+[32m[0402 16:51:25 @monitor.py:428][0m accuracy: 0.99437
+[32m[0402 16:51:25 @monitor.py:428][0m cost: nan
+[32m[0402 16:51:25 @monitor.py:428][0m error: 0.0056282
+[32m[0402 16:51:25 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:51:25 @monitor.py:428][0m validation_error: 0.3285
+[32m[0402 16:51:25 @group.py:44][0m Callbacks took 9.310 sec in total. InferenceRunner: 9.26 seconds
+[32m[0402 16:51:25 @base.py:262][0m Start Epoch 33 ...
+[32m[0402 16:51:41 @base.py:272][0m Epoch 33 (global_step 83985) finished, time:15.8 seconds.
+[32m[0402 16:51:41 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-83985.
+[32m[0402 16:51:50 @monitor.py:428][0m accuracy: 0.99939
+[32m[0402 16:51:50 @monitor.py:428][0m cost: nan
+[32m[0402 16:51:50 @monitor.py:428][0m error: 0.00061279
+[32m[0402 16:51:50 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:51:50 @monitor.py:428][0m validation_error: 0.33037
+[32m[0402 16:51:50 @group.py:44][0m Callbacks took 8.424 sec in total. InferenceRunner: 8.37 seconds
+[32m[0402 16:51:50 @base.py:262][0m Start Epoch 34 ...
+[32m[0402 16:52:04 @base.py:272][0m Epoch 34 (global_step 86530) finished, time:14.1 seconds.
+[32m[0402 16:52:04 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-86530.
+[32m[0402 16:52:14 @monitor.py:428][0m accuracy: 0.9994
+[32m[0402 16:52:14 @monitor.py:428][0m cost: nan
+[32m[0402 16:52:14 @monitor.py:428][0m error: 0.00059543
+[32m[0402 16:52:14 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:52:14 @monitor.py:428][0m validation_error: 0.3288
+[32m[0402 16:52:14 @group.py:44][0m Callbacks took 10.378 sec in total. InferenceRunner: 10 seconds
+[32m[0402 16:52:14 @base.py:262][0m Start Epoch 35 ...
+[32m[0402 16:52:28 @base.py:272][0m Epoch 35 (global_step 89075) finished, time:13.9 seconds.
+[32m[0402 16:52:28 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-89075.
+[32m[0402 16:52:40 @monitor.py:428][0m accuracy: 0.99939
+[32m[0402 16:52:40 @monitor.py:428][0m cost: nan
+[32m[0402 16:52:40 @monitor.py:428][0m error: 0.00061276
+[32m[0402 16:52:40 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:52:40 @monitor.py:428][0m validation_error: 0.33194
+[32m[0402 16:52:40 @group.py:44][0m Callbacks took 11.703 sec in total. InferenceRunner: 8.41 seconds
+[32m[0402 16:52:40 @base.py:262][0m Start Epoch 36 ...
+[32m[0402 16:52:55 @base.py:272][0m Epoch 36 (global_step 91620) finished, time:15.7 seconds.
+[32m[0402 16:52:55 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-91620.
+[32m[0402 16:53:04 @monitor.py:428][0m accuracy: 0.99939
+[32m[0402 16:53:04 @monitor.py:428][0m cost: nan
+[32m[0402 16:53:04 @monitor.py:428][0m error: 0.00061426
+[32m[0402 16:53:04 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:53:04 @monitor.py:428][0m validation_error: 0.33401
+[32m[0402 16:53:04 @group.py:44][0m Callbacks took 8.606 sec in total. InferenceRunner: 8.56 seconds
+[32m[0402 16:53:04 @base.py:262][0m Start Epoch 37 ...
+[32m[0402 16:53:18 @base.py:272][0m Epoch 37 (global_step 94165) finished, time:14 seconds.
+[32m[0402 16:53:18 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-94165.
+[32m[0402 16:53:28 @monitor.py:428][0m accuracy: 0.99939
+[32m[0402 16:53:28 @monitor.py:428][0m cost: nan
+[32m[0402 16:53:28 @monitor.py:428][0m error: 0.00061295
+[32m[0402 16:53:28 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:53:28 @monitor.py:428][0m validation_error: 0.33476
+[32m[0402 16:53:28 @group.py:44][0m Callbacks took 10.033 sec in total. InferenceRunner: 9.98 seconds
+[32m[0402 16:53:28 @base.py:262][0m Start Epoch 38 ...
+[32m[0402 16:53:42 @base.py:272][0m Epoch 38 (global_step 96710) finished, time:14 seconds.
+[32m[0402 16:53:42 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-96710.
+[32m[0402 16:53:51 @monitor.py:428][0m accuracy: 0.99939
+[32m[0402 16:53:51 @monitor.py:428][0m cost: nan
+[32m[0402 16:53:51 @monitor.py:428][0m error: 0.00061176
+[32m[0402 16:53:51 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:53:51 @monitor.py:428][0m validation_error: 0.33562
+[32m[0402 16:53:51 @group.py:44][0m Callbacks took 8.838 sec in total. InferenceRunner: 8.47 seconds
+[32m[0402 16:53:51 @base.py:262][0m Start Epoch 39 ...
+[32m[0402 16:54:07 @base.py:272][0m Epoch 39 (global_step 99255) finished, time:15.8 seconds.
+[32m[0402 16:54:07 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-99255.
+[32m[0402 16:54:16 @monitor.py:428][0m accuracy: 0.9994
+[32m[0402 16:54:16 @monitor.py:428][0m cost: nan
+[32m[0402 16:54:16 @monitor.py:428][0m error: 0.00059705
+[32m[0402 16:54:16 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:54:16 @monitor.py:428][0m validation_error: 0.33648
+[32m[0402 16:54:16 @group.py:44][0m Callbacks took 9.245 sec in total. InferenceRunner: 9.19 seconds
+[32m[0402 16:54:16 @base.py:262][0m Start Epoch 40 ...
+[32m[0402 16:54:29 @base.py:272][0m Epoch 40 (global_step 101800) finished, time:13.2 seconds.
+[32m[0402 16:54:29 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-101800.
+[32m[0402 16:54:39 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:54:39 @monitor.py:428][0m cost: nan
+[32m[0402 16:54:39 @monitor.py:428][0m error: 0.00011666
+[32m[0402 16:54:39 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:54:39 @monitor.py:428][0m validation_error: 0.33648
+[32m[0402 16:54:39 @group.py:44][0m Callbacks took 10.166 sec in total. InferenceRunner: 10.1 seconds
+[32m[0402 16:54:39 @base.py:262][0m Start Epoch 41 ...
+[32m[0402 16:54:54 @base.py:272][0m Epoch 41 (global_step 104345) finished, time:14.7 seconds.
+[32m[0402 16:54:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-104345.
+[32m[0402 16:55:04 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:55:04 @monitor.py:428][0m cost: nan
+[32m[0402 16:55:04 @monitor.py:428][0m error: 0.00011515
+[32m[0402 16:55:04 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:55:04 @monitor.py:428][0m validation_error: 0.33537
+[32m[0402 16:55:04 @group.py:44][0m Callbacks took 9.622 sec in total. InferenceRunner: 8.44 seconds
+[32m[0402 16:55:04 @base.py:262][0m Start Epoch 42 ...
+[32m[0402 16:55:19 @base.py:272][0m Epoch 42 (global_step 106890) finished, time:15.3 seconds.
+[32m[0402 16:55:19 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-106890.
+[32m[0402 16:55:28 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:55:28 @monitor.py:428][0m cost: nan
+[32m[0402 16:55:28 @monitor.py:428][0m error: 0.00011516
+[32m[0402 16:55:28 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:55:28 @monitor.py:428][0m validation_error: 0.33695
+[32m[0402 16:55:28 @group.py:44][0m Callbacks took 9.558 sec in total. InferenceRunner: 9.51 seconds
+[32m[0402 16:55:28 @base.py:262][0m Start Epoch 43 ...
+[32m[0402 16:55:42 @base.py:272][0m Epoch 43 (global_step 109435) finished, time:13.3 seconds.
+[32m[0402 16:55:42 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-109435.
+[32m[0402 16:55:51 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:55:51 @monitor.py:428][0m cost: nan
+[32m[0402 16:55:51 @monitor.py:428][0m error: 0.00011515
+[32m[0402 16:55:51 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:55:51 @monitor.py:428][0m validation_error: 0.33852
+[32m[0402 16:55:51 @group.py:44][0m Callbacks took 9.675 sec in total. InferenceRunner: 9.62 seconds
+[32m[0402 16:55:51 @base.py:262][0m Start Epoch 44 ...
+[32m[0402 16:56:07 @base.py:272][0m Epoch 44 (global_step 111980) finished, time:15.3 seconds.
+[32m[0402 16:56:07 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-111980.
+[32m[0402 16:56:18 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:56:18 @monitor.py:428][0m cost: nan
+[32m[0402 16:56:18 @monitor.py:428][0m error: 0.00011548
+[32m[0402 16:56:18 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:56:18 @monitor.py:428][0m validation_error: 0.33567
+[32m[0402 16:56:18 @group.py:44][0m Callbacks took 11.581 sec in total. InferenceRunner: 8.4 seconds
+[32m[0402 16:56:18 @base.py:262][0m Start Epoch 45 ...
+[32m[0402 16:56:34 @base.py:272][0m Epoch 45 (global_step 114525) finished, time:15.3 seconds.
+[32m[0402 16:56:34 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-114525.
+[32m[0402 16:56:43 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:56:43 @monitor.py:428][0m cost: nan
+[32m[0402 16:56:43 @monitor.py:428][0m error: 0.00011547
+[32m[0402 16:56:43 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:56:43 @monitor.py:428][0m validation_error: 0.34506
+[32m[0402 16:56:43 @group.py:44][0m Callbacks took 9.687 sec in total. InferenceRunner: 9.63 seconds
+[32m[0402 16:56:43 @base.py:262][0m Start Epoch 46 ...
+[32m[0402 16:56:56 @base.py:272][0m Epoch 46 (global_step 117070) finished, time:13.2 seconds.
+[32m[0402 16:56:59 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-117070.
+[32m[0402 16:57:10 @monitor.py:428][0m accuracy: 0.99578
+[32m[0402 16:57:10 @monitor.py:428][0m cost: nan
+[32m[0402 16:57:10 @monitor.py:428][0m error: 0.0042213
+[32m[0402 16:57:10 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:57:10 @monitor.py:428][0m validation_error: 0.34174
+[32m[0402 16:57:10 @group.py:44][0m Callbacks took 13.093 sec in total. InferenceRunner: 10.2 seconds
+[32m[0402 16:57:10 @base.py:262][0m Start Epoch 47 ...
+[32m[0402 16:57:24 @base.py:272][0m Epoch 47 (global_step 119615) finished, time:14.7 seconds.
+[32m[0402 16:57:24 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-119615.
+[32m[0402 16:57:33 @monitor.py:428][0m accuracy: 0.99987
+[32m[0402 16:57:33 @monitor.py:428][0m cost: nan
+[32m[0402 16:57:33 @monitor.py:428][0m error: 0.00013335
+[32m[0402 16:57:33 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:57:33 @monitor.py:428][0m validation_error: 0.34155
+[32m[0402 16:57:33 @group.py:44][0m Callbacks took 8.527 sec in total. InferenceRunner: 8.48 seconds
+[32m[0402 16:57:33 @base.py:262][0m Start Epoch 48 ...
+[32m[0402 16:57:48 @base.py:272][0m Epoch 48 (global_step 122160) finished, time:15.2 seconds.
+[32m[0402 16:57:48 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-122160.
+[32m[0402 16:57:58 @monitor.py:428][0m accuracy: 0.99989
+[32m[0402 16:57:58 @monitor.py:428][0m cost: nan
+[32m[0402 16:57:58 @monitor.py:428][0m error: 0.00011396
+[32m[0402 16:57:58 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:57:58 @monitor.py:428][0m validation_error: 0.34277
+[32m[0402 16:57:58 @group.py:44][0m Callbacks took 9.796 sec in total. InferenceRunner: 9.74 seconds
+[32m[0402 16:57:58 @base.py:262][0m Start Epoch 49 ...
+[32m[0402 16:58:11 @base.py:272][0m Epoch 49 (global_step 124705) finished, time:13.2 seconds.
+[32m[0402 16:58:11 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-124705.
+[32m[0402 16:58:20 @monitor.py:428][0m accuracy: 0.99987
+[32m[0402 16:58:20 @monitor.py:428][0m cost: nan
+[32m[0402 16:58:20 @monitor.py:428][0m error: 0.00013052
+[32m[0402 16:58:20 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:58:20 @monitor.py:428][0m validation_error: 0.3453
+[32m[0402 16:58:20 @group.py:44][0m Callbacks took 9.429 sec in total. InferenceRunner: 9.38 seconds
+[32m[0402 16:58:20 @base.py:262][0m Start Epoch 50 ...
+[32m[0402 16:58:36 @base.py:272][0m Epoch 50 (global_step 127250) finished, time:15.6 seconds.
+[32m[0402 16:58:36 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-127250.
+[32m[0402 16:58:45 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 16:58:45 @monitor.py:428][0m cost: nan
+[32m[0402 16:58:45 @monitor.py:428][0m error: 0.00011515
+[32m[0402 16:58:45 @monitor.py:428][0m validation_cost: inf
+[32m[0402 16:58:45 @monitor.py:428][0m validation_error: 0.34261
+[32m[0402 16:58:45 @group.py:44][0m Callbacks took 8.642 sec in total. InferenceRunner: 8.42 seconds
+[32m[0402 16:58:45 @base.py:262][0m Start Epoch 51 ...
+[32m[0402 16:58:59 @base.py:272][0m Epoch 51 (global_step 129795) finished, time:14.3 seconds.
+[32m[0402 16:58:59 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-129795.
+[32m[0402 16:59:15 @base.py:280][0m Detected Ctrl-C and exiting main loop.
