@@ -200,7 +200,7 @@ def train_rnn(model, step_size, unique, sub_data, batch_size):
     #         print("Max len: {}".format(max_length))
 
 
-    config = get_config(data, run_inference=False)
+    config = get_config(data, run_inference=True)
 
     # TODO change trainer
     launch_train_with_config(config, SimpleTrainer())
