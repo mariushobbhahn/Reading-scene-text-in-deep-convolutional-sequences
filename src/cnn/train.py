@@ -113,10 +113,9 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     ds_train = BatchData(ds_train, batch_size)
     ds_test = BatchData(ds_test, 2 * batch_size, remainder=True)
 
-    # da = ds_train.get_data()
-    # for x in da:
-    #     print(x)
-    return ds_train, ds_test
+    # Swapped train and test set, because test set is larger
+
+    return ds_test, ds_train
 
 
 def get_config(data, max_epoch=1500, lr_decay_rate=0.99, run_inference=True):
@@ -165,7 +164,7 @@ def train(unique=False, sub_data=None, batch_size=None):
                     sub_data=sub_data,
                     batch_size=batch_size)
 
-    c = get_config(data, run_inference=True)
+    c = get_config(data, run_inference=False)
 
     #TODO change trainer
     launch_train_with_config(c, SimpleTrainer())

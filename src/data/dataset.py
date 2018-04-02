@@ -96,11 +96,24 @@ def _sparse_label(labels):
     return (indices, values, shape)
 
 
+class _FilterFeatures(ProxyDataFlow):
+    def __init__(self, ds):
+        self.ds = ds
+
+    def size(self):
+        return len(list(self.get_data()))
+
+    def get_data(self):
+        for features, label in self.ds.get_data():
+            if len(label) <= features.shape[0]:
+                yield features, label
+
+
 class BatchedFeatures(ProxyDataFlow):
 
     def __init__(self, ds, batch):
         self.batch = batch
-        self.ds = ds
+        self.ds = _FilterFeatures(ds)
 
     def size(self):
         return self.ds.size() // self.batch
@@ -110,20 +123,21 @@ class BatchedFeatures(ProxyDataFlow):
         for _ in range(self.size()):
             feats = []
             labs = []
+            seqlen = []
+
             for b in range(self.batch):
                 feat, lab = next(itr)
 
-                if feat.shape[0] < len(lab):
-                    b -= 1
-                    continue
-
+                # print("Bacth label {} with {} features".format(lab, feat.shape[0]))
                 feats.append(feat)
                 labs.append(lab)
+                seqlen.append(feat.shape[0])
+
             batchfeat = _batch_feature(feats)
             batchlab = _sparse_label(labs)
-            seqlen = np.asarray([k.shape[0] for k in feats])
+            seqlen = np.asarray(seqlen)
 
             # print("Process label: {}".format(labs[0]))
             # print("Features: {}, label: {}".format(batchfeat.shape, batchlab))
-
+            # print("Yield batch with len {}".format(seqlen))
             yield [batchfeat, batchlab[0], batchlab[1], batchlab[2], seqlen]
