@@ -45,6 +45,8 @@ class TrainRNNModel(ModelDesc):
         # inputs contains a list of input variables defined above
         feat, labelidx, labelvalue, labelshape, seqlen = inputs
 
+        labelvalue = tf.Print(labelvalue, [labelvalue], message="labelVal", summarize=100, first_n=10)
+
         label = tf.SparseTensor(labelidx, labelvalue, labelshape)
 
         #features, label = inputs
@@ -52,6 +54,14 @@ class TrainRNNModel(ModelDesc):
 
         #build the graph
         logits = build_rnn(feat, seqlen)
+
+        logits = tf.Print(logits,
+                          [tf.argmax(logits, axis=2, name='prediction')],
+                          # [tf.nn.softmax(logits, name='sm')],
+                          summarize=100,
+                          first_n=10,
+                          message="pred: ")
+
 
         # Cost function
         loss = tf.nn.ctc_loss(label, logits, seqlen, time_major=False)
@@ -143,7 +153,7 @@ class TrainRNNModel(ModelDesc):
     def _get_optimizer(self):
         #we use the adam optimizer for simplicity
         #as described in the paper we use learning rate 0.0001 and momentum term of 0.9
-        return tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.9)
+        return tf.train.AdamOptimizer(learning_rate=0.0001, beta1=0.90)
 
 
 
@@ -238,7 +248,7 @@ def train_rnn(model, step_size, unique, sub_data, batch_size):
     #         print("Max len: {}".format(max_length))
 
 
-    config = get_config(data, run_inference=True)
+    config = get_config(data, run_inference=False)
 
     # TODO change trainer
     launch_train_with_config(config, SimpleTrainer())
