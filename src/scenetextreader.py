@@ -11,8 +11,3 @@ class SceneTextReader():
 
         self.character_predictor = CharacterPredictor(cnn_model)
 
-
-
-
-
-    def readText(self, scene):

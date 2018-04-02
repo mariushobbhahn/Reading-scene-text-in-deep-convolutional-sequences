@@ -91,8 +91,6 @@ def build_rnn(inputs, sequence_length):
     return logits
 
 
-def _tower_func(input):
-
 
 class FeaturePredictor(OfflinePredictor):
 
