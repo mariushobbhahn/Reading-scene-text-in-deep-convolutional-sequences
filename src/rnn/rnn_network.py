@@ -3,6 +3,8 @@ from tensorpack import *
 import tensorflow as tf
 import numpy as np
 
+import string
+
 import tensorflow.contrib.rnn as rnn
 
 import tensorflow as tf
@@ -90,16 +92,39 @@ def build_rnn(inputs, sequence_length):
 
     return logits
 
+def _tower_func(features, seqlen):
+    logits = build_rnn(features, seqlen)
+    # transpose to fit major_time
+    logits = tf.transpose(logits, (1, 0, 2))
+
+    logits = tf.to_int32(tf.nn.ctc_beam_search_decoder(logits, seqlen)[0][0], name='prediction')
+
+    return logits
+
+
+
 
 
 class FeaturePredictor(OfflinePredictor):
-
     def __init__(self, model):
         config = PredictConfig(
-            inputs_desc=[InputDesc(tf.float32, (None, None, 128), 'input')],
+            inputs_desc=[InputDesc(tf.float32, (None, None, 128), 'features'),
+                         InputDesc(tf.int32, (None,), 'length')],
             tower_func=_tower_func,
             session_init=SaverRestore(model),
-            input_names=['input'],
-            output_names=['max3/output'])
+            input_names=['features', 'length'],
+            output_names=['prediction'])
 
         super(FeaturePredictor, self).__init__(config)
+
+    def predict(self, feature_list):
+        length = len(feature_list)
+        l = np.array([length]).reshape((1,)).astype('int32')
+        feats = np.array(feature_list).reshape((1, length, 128)).astype('float32')
+
+        return self(feats, l)[0]
+
+    def predict_label(self, feature_list):
+        int_labels = self.predict(feature_list)
+        chars = [int_label_to_char(k) for k in int_labels]
+        return ''.join(chars).upper()

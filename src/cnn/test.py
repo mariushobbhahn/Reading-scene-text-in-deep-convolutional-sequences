@@ -15,24 +15,15 @@ from data.utils import int_label_to_char, load_lmdb
 
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
+from rnn.rnn_network import FeaturePredictor
 
 
-def print_wrong(model):
-
-    ds = load_lmdb(IIIT5KChar('test'))
-    p = CharacterPredictor(model)
-
-    ds.reset_state()
-
-    for img, label in ds.get_data():
-        img = img.reshape((1, 32, 32)).astype('float32')
-        predicted_label = np.argmax(p(img)[1][0])
-        print("Predicted {} for {}".format(predicted_label, label))
 
 
-def test(path, model):
-    print_wrong(model)
+def test(path, cnn_model, rnn_model):
 
+    cnn = CharacterPredictor(cnn_model)
+    rnn = FeaturePredictor(rnn_model)
 
     print("Load image from {}".format(path))
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
@@ -41,6 +32,7 @@ def test(path, model):
         print("Failed to load image!")
         exit()
 
-    for char in predictor.predict_characters(img, step_size=8, map_to_char=True):
-        char = int_label_to_char(np.argmax(char))
-        print("Found character: {}".format(char))
+    feats = list(cnn.predict_features(img, step_size=8))
+    label = rnn.predict_label(feats)
+
+    print("Label: {}".format(label))
