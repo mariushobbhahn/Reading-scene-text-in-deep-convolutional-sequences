@@ -35,7 +35,7 @@ def build_rnn(inputs, sequence_length):
     # seq_length = len(sequence_of_128D_vectors)
 
     # inputs = tf.expand_dims(inputs, 3)
-    num_LSTMs_per_layer = 128  # as described in the paper
+    num_lstm = 128  # as described in the paper
 
     """RNN Cells"""
     # bidirectional LSTM with 128 layers each
@@ -46,8 +46,8 @@ def build_rnn(inputs, sequence_length):
     #    dtype=tf.float32
     # )
 
-    outputs, _ = tf.nn.bidirectional_dynamic_rnn(rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh),
-                                                 rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh),
+    outputs, _ = tf.nn.bidirectional_dynamic_rnn(rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh),
+                                                 rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh),
                                                  inputs,
                                                  sequence_length=sequence_length,
                                                  dtype=tf.float32)
@@ -62,12 +62,15 @@ def build_rnn(inputs, sequence_length):
     logits = tf.contrib.layers.fully_connected(
         inputs=logits,
         num_outputs=37,  # these are the 36 characters plus the symbol for no character
-        activation_fn=tf.identity)
+        activation_fn=tf.identity,
+        weights_initializer=tf.truncated_normal_initializer(stddev=0.01))
+    
+#    logits = tf.Print(logits, [logits], summarize=64)
 
     # print("FC shape: {}".format(logits.shape))
 
-    """softmax as described in the paper"""
-
-    logits = tf.nn.softmax(logits, name='final_logits')
+    ## ctc loss requires un-softmaxed logits
+    # """softmax as described in the paper"""
+    # logits = tf.nn.softmax(logits, name='final_logits')
 
     return logits
