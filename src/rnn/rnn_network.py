@@ -5,6 +5,23 @@ import numpy as np
 
 import tensorflow.contrib.rnn as rnn
 
+import tensorflow as tf
+import numpy as np
+
+# Just import everything into current namespace
+from tensorpack import *
+from tensorpack.tfutils import summary
+from tensorpack.models.nonlin import Maxout
+from tensorflow.python.platform import flags
+
+from tensorpack.predict import OfflinePredictor, PredictConfig
+from data.utils import int_label_to_char
+
+# from tensorflow.python.layers import maxout
+from data.utils import convert_image_to_array
+
+
+
 """
 Explanation:
 
@@ -31,8 +48,6 @@ The output of the LSTM is then given into the CTC. (This happens in the train cl
 
 def build_rnn(inputs, sequence_length):
     """Constants:"""
-    # TODO lenght not known at this point
-    # seq_length = len(sequence_of_128D_vectors)
 
     # inputs = tf.expand_dims(inputs, 3)
     num_lstm = 128  # as described in the paper
@@ -74,3 +89,19 @@ def build_rnn(inputs, sequence_length):
     # logits = tf.nn.softmax(logits, name='final_logits')
 
     return logits
+
+
+def _tower_func(input):
+
+
+class FeaturePredictor(OfflinePredictor):
+
+    def __init__(self, model):
+        config = PredictConfig(
+            inputs_desc=[InputDesc(tf.float32, (None, None, 128), 'input')],
+            tower_func=_tower_func,
+            session_init=SaverRestore(model),
+            input_names=['input'],
+            output_names=['max3/output'])
+
+        super(FeaturePredictor, self).__init__(config)

@@ -45,7 +45,11 @@ class TrainRNNModel(ModelDesc):
         # inputs contains a list of input variables defined above
         feat, labelidx, labelvalue, labelshape, seqlen = inputs
 
-        labelvalue = tf.Print(labelvalue, [labelvalue], message="labelVal", summarize=100, first_n=10)
+        labelvalue = tf.Print(labelvalue,
+                              [labelvalue],
+                              message="labelVal",
+                              first_n=10,
+                              summarize=100)
 
         label = tf.SparseTensor(labelidx, labelvalue, labelshape)
 
@@ -66,7 +70,7 @@ class TrainRNNModel(ModelDesc):
         # Cost function
         loss = tf.nn.ctc_loss(label, logits, seqlen, time_major=False)
 
-        cost = tf.reduce_mean(loss, name='cost')
+        self.cost = tf.reduce_mean(loss, name='cost')
 
         # logits = tf.nn.softmax(logits, name='sm_logits')
         
@@ -89,10 +93,9 @@ class TrainRNNModel(ModelDesc):
 
 
 
-#        self.cost = tf.Print(cost, [cost], name='total_cost')
+        #self.cost = tf.Print(cost, [cost], name='total_cost')
         #accuracy = tf.reduce_mean(1 - err, name='accuracy')
         #summary.add_moving_summary(err, accuracy)
-
 
         #summary.add_moving_summary(cost, self.cost)
         summary.add_moving_summary(err, self.cost, accuracy)
@@ -185,7 +188,7 @@ def get_data(model, step_size, unique, sub_data, batch_size):
 def train_rnn(model, step_size, unique, sub_data, batch_size):
 
     # automatically setup the directory for logging
-    logger.set_logger_dir(cfg.TRAIN_LOG_DIR)
+    logger.set_logger_dir(os.path.join(cfg.TRAIN_LOG_DIR, "rnn"))
 
     data = (ds_train, ds_test) = get_data(model, step_size, unique, sub_data, batch_size)
 
