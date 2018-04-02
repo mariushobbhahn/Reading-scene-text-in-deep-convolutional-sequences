@@ -2,6 +2,8 @@ import os
 import sys
 import argparse
 import config
+import tensorflow as tf
+import tensorpack as tp
 
 
 from cnn.train import train
@@ -58,4 +60,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
+
     main(sys.argv[1:])

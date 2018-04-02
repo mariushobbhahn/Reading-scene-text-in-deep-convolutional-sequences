@@ -1,0 +1,91 @@
+\documentclass{utue} %utue.cls required for Uni Tuebingen corporate design
+
+% Values for title generation
+\title{Reading scene text in deep convolutional sequences}
+\author{Jan Haug, Marius Hobbhahn, Roman Schulte}
+\date{\today}
+
+% Subtitle is optional. It represents what kind of work you did.
+\subtitle{Winter Term 2017}
+
+\begin{document}
+
+% You can place a teaser as follows. (Otherwise, just uncomment the following part)
+\teaser{
+    \includegraphics[width=\textwidth]{images/teaser.jpg}
+    \caption{\label{fig:teaser}You can place a teaser here.}
+}
+
+% Creates title of document and additional title page.
+\maketitle
+
+\section*{Abstract}
+
+\section{Introduction}
+
+Natural scene recognition is one of the most important steps in automation. Self-driving cars will have to be able to identify construction signs to follow their instructions, traffic agencies can identify license plates of traffic offenders %citation of license plate paper
+and robots will need to read text and numbers in a natural environment. In 2015 He et. al ~\cite{2015arXiv150604395H} proposed a model to read scene text in natural environments with a combination of a convolutional neural network (CNN) and recurrent neural networks (RNN) that not only allows to interpret words but also sequences of numbers or letters without any representation in a dictionary, i.e. an advertisement of a product. One of the main challenges of scene recognition is the high variance in image quality and style of displayed signs. An advertisement might look very different than the same word handwritten on paper even though it conveys the same meaning. The approach chosen by the authors has some advantages over previous approaches (i.e. %citation of previous approaches) 
+which are not able to capture all representations of strings in a natural environment. It tries to use both the advantages for character recognition of CNNs and the context information for sequences of RNNs and combine them in one model: \\
+\begin{enumerate}
+	\item CNNs have become very accurate at character recognition and building high level representations (citation needed). By moving a sliding window over a given picture, we are able to input single signs without worrying about context information at this stage. The simplicity of a sliding window approach implies that some frames will not represent anything meaningful but these problems will be corrected by the RNN. On the other hand this simplicity means no complex algorithm needs to be evolved and it can be applied on any given input image.
+	\item RNNs are very strong at accounting for context information (citation needed). Especially for representations that come in sequences, like words, this is valuable. Due to this the RNN can make decisions for a sign based on all previously identified signs, i.e. The letter 'a' might be more likely to occur after a 'b' than an 'y'. To use context information from previous and later signs we use a bidirectional approach, that independently applies the model forwards and backwards. 
+	\item If property 1 and 2 are combined successfully it is possible to Process unknown words and arbitrary strings. Since the training is done in a compositional way it is independent of dictionaries or corpora of already known words and combinations of strings. Therefore it would be able to read the information on any given picture even if no meaning is attached to it. 
+\end{enumerate}
+The main contribution of this paper was to improve the accuracy in scene text recognition on given benchmark test sets like the IIT5K. Our contribution is merely to apply the same methods on the same test sets and see if we are able to achieve the same results. 
+
+\section{Related Work}
+%don't just copy papers from the original paper, but look for more recent ones, i.e. 2016/17
+%describe the research goal of the other paper, the differences to our approach and why this difference is important here
+% this is the citation of the main paper ~\cite{2015arXiv150604395H} 
+
+~\cite{2015arXiv150604395H}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=.9\columnwidth]{images/tuebingen4b_um_rot_small.pdf}
+  \caption{\label{fig:figure1}This is a figure.}
+\end{figure}
+An example is given in Figure~\ref{fig:figure1}.
+
+\section{Structure of the network}
+%just the theory behind the network
+After applying a sliding window on a given image each frame is forwarded into a CNN. The sequence of resulting feature vectors is then sent through the RNN and results in a sequence of characters and numbers. An overview of the whole network is given in graphic %ref graphic
+
+\subsection{Data wrangling}
+We rescale the image to height 32 and then apply a sliding window of framesize 32x32 for every 8 pixels of length. When reaching the end of the image we adjust the current frame such that the last frame is 32x32 and includes the column of pixels on the right edge of the image. 
+
+\subsection{Structure of the CNN}
+The CNN has 5 convolutional layers. In the first 3 we apply a 9x9 kernel on the inputs and use a max. group of 2. For the 4th layer a 8x8 kernel and a max group of 4 is used to reduce the dimensionality of the output vector to 128. Note that this output of a 128D feature vector is forwarded into the RNN. The 5th layer uses a 1x1 kernel %is this equivalent to no kernel?
+and also uses a max group of 4 to further reduce dimensionality. This output is then forwarded through a fully connected layer with 36 outputs for the 26 possible lower case characters and 10 numbers. For activation we use the identity function. Note that the last convolutional and the fully connected layer are merely used for the training of the CNN but later not used for the classification in the RNN. A detailed description of the network can be seen in graphic %ref graphic.
+
+\subsection{Structure of the RNN}
+The recurrent part of the network receives a sequence of feature vectors, each of which is provided by the CNN. We use bidirectional stacked long-short-term-memory (LSTM) cell blocks with 128 inputs respectively. Bidirectional means that the RNN essentially has 2 independent units. In one the sequence is put in forwards and the other backwards. The results are then concatenated afterwards and fed into a fully connected layer with 37 output classes. 26 for each character 10 for numbers and 1 for undetectable sign or no character. \\
+At this point we still have redundancies or unclear information due to the sliding window. To solve this problem a connectionist temporal classification (CTC) is used. A detailed explanation would be outside of the scope of this paper and can be found here %ref.
+But for a working explanation consider it as a way to remove unlikely information given the labels. In sequential information the placement of non-character symbols or redundancies is always hard to deal with. The CTC approach therefore uses a hidden Markov model (HMM) to sample different possible outcomes as paths and choose the path with highest likelihood. Consider an example where the sequence after the LSTM cell block is "iiii---mmmmaaagggee--", where - represents the non-character symbol. The CTC would then reduce the redundancies and remove non-character symbols until the most likely outcome, "image" is put out. The information learned by the CTC during the training are backpropagated through the network such that future classification can already access them. 
+
+\section{Implementation details}
+%here are the names of functions, comparisons with other possible implementations and numbers (i.e. number of epochs, momentum terms, learning rates, etc. )
+\subsection{Data wrangling}
+\paragraph{Sliding window}
+\paragraph{Batch sizes}
+\subsection{Implementation details of the CNN}
+
+\subsection{Implementation details of the RNN}
+
+\section{Experiments and Results}
+%detailed description of what datasets we were using, what the results of the singular training for the CNN were, what the results for the RNN were
+%explanation of the inference runner, test error and validation accuracy
+
+\section{Conclusion}
+%include ideas that could further improve the accuracy, i.e. not train in two steps but in one
+%name other papers that are related to this or follow up on it (and what they did better)
+
+
+\bibliographystyle{alpha}
+\bibliography{bibliography}
+%https://github.com/chongyangtao/Awesome-Scene-Text-Recognition
+%https://arxiv.org/abs/1709.01727 (this is a follow up paper)
+%https://arxiv.org/pdf/1601.01100.pdf (same approach for house number recognition)
+%http://adsabs.harvard.edu/abs/2016arXiv160105610L (same approach for license plate recognition)
+
+\end{document}
