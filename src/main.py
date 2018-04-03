@@ -43,8 +43,10 @@ def main(argv):
 
     model = args.load or os.path.join(config.RES_DIR, 'cnn_model/max-validation_accuracy')
 
+    rnn_model = os.path.join(config.RES_DIR, 'rnn_model/model-386840')
+
     if args.test:
-        test(args.test, model)
+        test(args.test, model, rnn_model)
     elif args.train_rnn:
         step_size = args.step_size if args.step_size else 8
         train_rnn(model,

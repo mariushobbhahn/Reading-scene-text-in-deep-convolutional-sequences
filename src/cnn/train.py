@@ -113,9 +113,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     ds_train = BatchData(ds_train, batch_size)
     ds_test = BatchData(ds_test, 2 * batch_size, remainder=True)
 
-    # Swapped train and test set, because test set is larger
-
-    return ds_test, ds_train
+    return ds_train, ds_test
 
 
 def get_config(data, max_epoch=1500, lr_decay_rate=0.99, run_inference=True):

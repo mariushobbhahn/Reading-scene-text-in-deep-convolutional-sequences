@@ -2,18 +2,11 @@
 .secret
 
 # ignore data
-<<<<<<< HEAD
 res/data/
 res/dump/
 res/train_log/
-<<<<<<< HEAD
 res/cnn_model/
-=======
-res/
->>>>>>> 0863907cc49f657fc0d168b4340c5f826b720f8a
-=======
 res/cnn_model/schulte*
->>>>>>> b164f12116e15b17448fd999bae006d9c926720e
 
 # ignore logs
 src/train_log/

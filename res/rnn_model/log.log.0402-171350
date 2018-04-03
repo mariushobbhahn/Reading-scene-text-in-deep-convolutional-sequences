@@ -1,0 +1,372 @@
+[32m[0402 16:59:58 @logger.py:74][0m Argv: main.py --train-rnn
+[32m[0402 16:59:58 @format.py:91][0m Found 2000 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_train.mdb
+[32m[0402 16:59:58 @format.py:91][0m Found 3000 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_test.mdb
+[32m[0402 16:59:58 @registry.py:121][0m conv0 input: [None, 32, 32, 1]
+[32m[0402 16:59:58 @registry.py:129][0m conv0 output: [None, 24, 24, 96]
+[32m[0402 16:59:58 @registry.py:121][0m conv1 input: [None, 24, 24, 48]
+[32m[0402 16:59:58 @registry.py:129][0m conv1 output: [None, 16, 16, 128]
+[32m[0402 16:59:58 @registry.py:121][0m conv2 input: [None, 16, 16, 64]
+[32m[0402 16:59:58 @registry.py:129][0m conv2 output: [None, 8, 8, 256]
+[32m[0402 16:59:58 @registry.py:121][0m conv3 input: [None, 8, 8, 128]
+[32m[0402 16:59:58 @registry.py:129][0m conv3 output: [None, 1, 1, 512]
+[32m[0402 16:59:58 @registry.py:121][0m conv4 input: [None, 1, 1, 128]
+[32m[0402 16:59:58 @registry.py:129][0m conv4 output: [None, 1, 1, 144]
+[32m[0402 16:59:58 @registry.py:121][0m fc input: [None, 1, 1, 36]
+[32m[0402 16:59:58 @registry.py:129][0m fc output: [None, 36]
+[32m[0402 16:59:58 @sessinit.py:90][0m [5m[31mWRN[0m The following variables are in the checkpoint, but not found in the graph: beta1_power:0, beta2_power:0, global_step:0
+[32m[0402 16:59:58 @sessinit.py:117][0m Restoring checkpoint from /graphics/scratch/student_datasets/cgpraktikum17/deep-sequences/project/res/cnn_model/max-validation_accuracy ...
+[32m[0402 16:59:58 @format.py:91][0m Found 1766 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_train_features_8.mdb
+[32m[0402 16:59:58 @format.py:91][0m Found 2545 entries in /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/IIIT5K_test_features_8.mdb
+[32m[0402 16:59:58 @trainers.py:52][0m Building graph for a single training tower ...
+[32m[0402 16:59:59 @model_utils.py:49][0m [36mTrainable Variables: 
+[0mname                                           shape          dim
+---------------------------------------------  ----------  ------
+bidirectional_rnn/fw/basic_lstm_cell/kernel:0  [256, 512]  131072
+bidirectional_rnn/fw/basic_lstm_cell/bias:0    [512]          512
+bidirectional_rnn/bw/basic_lstm_cell/kernel:0  [256, 512]  131072
+bidirectional_rnn/bw/basic_lstm_cell/bias:0    [512]          512
+fully_connected/weights:0                      [256, 37]     9472
+fully_connected/biases:0                       [37]            37[36m
+Total #vars=6, #params=272677, size=1.04MB[0m
+[32m[0402 16:59:59 @base.py:209][0m Setup callbacks graph ...
+[32m[0402 16:59:59 @summary.py:35][0m Maintain moving average summary of 3 tensors in collection MOVING_SUMMARY_OPS.
+[32m[0402 16:59:59 @summary.py:72][0m Summarizing collection 'summaries' of size 3.
+[32m[0402 17:00:00 @base.py:227][0m Creating the session ...
+[32m[0402 17:00:00 @base.py:235][0m Initializing the session ...
+[32m[0402 17:00:00 @base.py:242][0m Graph Finalized.
+[32m[0402 17:00:00 @monitor.py:311][0m [5m[31mWRN[0m History epoch value 50 from JSON is not the predecessor of the starting_epoch value 1
+[32m[0402 17:00:00 @monitor.py:312][0m [5m[31mWRN[0m If you want to resume old training, either use `AutoResumeTrainConfig` or correctly set the starting_epoch yourself to avoid inconsistency. Epoch number will not be automatically loaded by JSONWriter.
+[32m[0402 17:00:00 @monitor.py:320][0m [5m[31mWRN[0m Now, we will start training at epoch 1 and backup old json to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/stats.json.0402-170000
+[32m[0402 17:00:00 @base.py:262][0m Start Epoch 1 ...
+[32m[0402 17:00:15 @base.py:272][0m Epoch 1 (global_step 2545) finished, time:15.2 seconds.
+[32m[0402 17:00:15 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-2545.
+[32m[0402 17:00:15 @monitor.py:428][0m accuracy: 0.040881
+[32m[0402 17:00:15 @monitor.py:428][0m cost: nan
+[32m[0402 17:00:15 @monitor.py:428][0m error: 0.95912
+[32m[0402 17:00:15 @base.py:262][0m Start Epoch 2 ...
+[32m[0402 17:00:28 @base.py:272][0m Epoch 2 (global_step 5090) finished, time:13.2 seconds.
+[32m[0402 17:00:28 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-5090.
+[32m[0402 17:00:28 @monitor.py:428][0m accuracy: 0.29652
+[32m[0402 17:00:28 @monitor.py:428][0m cost: nan
+[32m[0402 17:00:28 @monitor.py:428][0m error: 0.70348
+[32m[0402 17:00:28 @base.py:262][0m Start Epoch 3 ...
+[32m[0402 17:00:44 @base.py:272][0m Epoch 3 (global_step 7635) finished, time:15.4 seconds.
+[32m[0402 17:00:44 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-7635.
+[32m[0402 17:00:44 @monitor.py:428][0m accuracy: 0.45073
+[32m[0402 17:00:44 @monitor.py:428][0m cost: nan
+[32m[0402 17:00:44 @monitor.py:428][0m error: 0.54927
+[32m[0402 17:00:44 @base.py:262][0m Start Epoch 4 ...
+[32m[0402 17:00:58 @base.py:272][0m Epoch 4 (global_step 10180) finished, time:14.5 seconds.
+[32m[0402 17:00:58 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-10180.
+[32m[0402 17:00:58 @monitor.py:428][0m accuracy: 0.51827
+[32m[0402 17:00:58 @monitor.py:428][0m cost: nan
+[32m[0402 17:00:58 @monitor.py:428][0m error: 0.48173
+[32m[0402 17:00:58 @base.py:262][0m Start Epoch 5 ...
+[32m[0402 17:01:12 @base.py:272][0m Epoch 5 (global_step 12725) finished, time:13.2 seconds.
+[32m[0402 17:01:12 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-12725.
+[32m[0402 17:01:12 @monitor.py:428][0m accuracy: 0.54614
+[32m[0402 17:01:12 @monitor.py:428][0m cost: nan
+[32m[0402 17:01:12 @monitor.py:428][0m error: 0.45386
+[32m[0402 17:01:12 @base.py:262][0m Start Epoch 6 ...
+[32m[0402 17:01:27 @base.py:272][0m Epoch 6 (global_step 15270) finished, time:15.8 seconds.
+[32m[0402 17:01:27 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-15270.
+[32m[0402 17:01:27 @monitor.py:428][0m accuracy: 0.57897
+[32m[0402 17:01:27 @monitor.py:428][0m cost: nan
+[32m[0402 17:01:27 @monitor.py:428][0m error: 0.42103
+[32m[0402 17:01:27 @base.py:262][0m Start Epoch 7 ...
+[32m[0402 17:01:42 @base.py:272][0m Epoch 7 (global_step 17815) finished, time:14.1 seconds.
+[32m[0402 17:01:42 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-17815.
+[32m[0402 17:01:42 @monitor.py:428][0m accuracy: 0.61776
+[32m[0402 17:01:42 @monitor.py:428][0m cost: nan
+[32m[0402 17:01:42 @monitor.py:428][0m error: 0.38224
+[32m[0402 17:01:42 @base.py:262][0m Start Epoch 8 ...
+[32m[0402 17:01:55 @base.py:272][0m Epoch 8 (global_step 20360) finished, time:13.8 seconds.
+[32m[0402 17:01:59 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-20360.
+[32m[0402 17:01:59 @monitor.py:428][0m accuracy: 0.63679
+[32m[0402 17:01:59 @monitor.py:428][0m cost: nan
+[32m[0402 17:01:59 @monitor.py:428][0m error: 0.36321
+[32m[0402 17:01:59 @group.py:44][0m Callbacks took 3.501 sec in total. ModelSaver: 3.48 seconds
+[32m[0402 17:01:59 @base.py:262][0m Start Epoch 9 ...
+[32m[0402 17:02:14 @base.py:272][0m Epoch 9 (global_step 22905) finished, time:15.2 seconds.
+[32m[0402 17:02:14 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-22905.
+[32m[0402 17:02:14 @monitor.py:428][0m accuracy: 0.64886
+[32m[0402 17:02:14 @monitor.py:428][0m cost: nan
+[32m[0402 17:02:14 @monitor.py:428][0m error: 0.35114
+[32m[0402 17:02:14 @base.py:262][0m Start Epoch 10 ...
+[32m[0402 17:02:27 @base.py:272][0m Epoch 10 (global_step 25450) finished, time:13.1 seconds.
+[32m[0402 17:02:27 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-25450.
+[32m[0402 17:02:27 @monitor.py:428][0m accuracy: 0.65316
+[32m[0402 17:02:27 @monitor.py:428][0m cost: nan
+[32m[0402 17:02:27 @monitor.py:428][0m error: 0.34684
+[32m[0402 17:02:27 @base.py:262][0m Start Epoch 11 ...
+[32m[0402 17:02:42 @base.py:272][0m Epoch 11 (global_step 27995) finished, time:15.2 seconds.
+[32m[0402 17:02:43 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-27995.
+[32m[0402 17:02:43 @monitor.py:428][0m accuracy: 0.68631
+[32m[0402 17:02:43 @monitor.py:428][0m cost: nan
+[32m[0402 17:02:43 @monitor.py:428][0m error: 0.31369
+[32m[0402 17:02:43 @base.py:262][0m Start Epoch 12 ...
+[32m[0402 17:02:57 @base.py:272][0m Epoch 12 (global_step 30540) finished, time:14.7 seconds.
+[32m[0402 17:02:57 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-30540.
+[32m[0402 17:02:57 @monitor.py:428][0m accuracy: 0.70585
+[32m[0402 17:02:57 @monitor.py:428][0m cost: nan
+[32m[0402 17:02:57 @monitor.py:428][0m error: 0.29415
+[32m[0402 17:02:57 @base.py:262][0m Start Epoch 13 ...
+[32m[0402 17:03:10 @base.py:272][0m Epoch 13 (global_step 33085) finished, time:13.2 seconds.
+[32m[0402 17:03:10 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-33085.
+[32m[0402 17:03:10 @monitor.py:428][0m accuracy: 0.72578
+[32m[0402 17:03:10 @monitor.py:428][0m cost: nan
+[32m[0402 17:03:10 @monitor.py:428][0m error: 0.27422
+[32m[0402 17:03:10 @base.py:262][0m Start Epoch 14 ...
+[32m[0402 17:03:26 @base.py:272][0m Epoch 14 (global_step 35630) finished, time:15.5 seconds.
+[32m[0402 17:03:26 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-35630.
+[32m[0402 17:03:26 @monitor.py:428][0m accuracy: 0.75717
+[32m[0402 17:03:26 @monitor.py:428][0m cost: nan
+[32m[0402 17:03:26 @monitor.py:428][0m error: 0.24283
+[32m[0402 17:03:26 @base.py:262][0m Start Epoch 15 ...
+[32m[0402 17:03:40 @base.py:272][0m Epoch 15 (global_step 38175) finished, time:14.3 seconds.
+[32m[0402 17:03:40 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-38175.
+[32m[0402 17:03:40 @monitor.py:428][0m accuracy: 0.76237
+[32m[0402 17:03:40 @monitor.py:428][0m cost: nan
+[32m[0402 17:03:40 @monitor.py:428][0m error: 0.23763
+[32m[0402 17:03:40 @base.py:262][0m Start Epoch 16 ...
+[32m[0402 17:03:53 @base.py:272][0m Epoch 16 (global_step 40720) finished, time:13.2 seconds.
+[32m[0402 17:03:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-40720.
+[32m[0402 17:03:54 @monitor.py:428][0m accuracy: 0.79897
+[32m[0402 17:03:54 @monitor.py:428][0m cost: nan
+[32m[0402 17:03:54 @monitor.py:428][0m error: 0.20103
+[32m[0402 17:03:54 @base.py:262][0m Start Epoch 17 ...
+[32m[0402 17:04:10 @base.py:272][0m Epoch 17 (global_step 43265) finished, time:15.8 seconds.
+[32m[0402 17:04:10 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-43265.
+[32m[0402 17:04:10 @monitor.py:428][0m accuracy: 0.83763
+[32m[0402 17:04:10 @monitor.py:428][0m cost: nan
+[32m[0402 17:04:10 @monitor.py:428][0m error: 0.16237
+[32m[0402 17:04:10 @base.py:262][0m Start Epoch 18 ...
+[32m[0402 17:04:24 @base.py:272][0m Epoch 18 (global_step 45810) finished, time:13.8 seconds.
+[32m[0402 17:04:24 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-45810.
+[32m[0402 17:04:24 @monitor.py:428][0m accuracy: 0.83654
+[32m[0402 17:04:24 @monitor.py:428][0m cost: nan
+[32m[0402 17:04:24 @monitor.py:428][0m error: 0.16346
+[32m[0402 17:04:24 @base.py:262][0m Start Epoch 19 ...
+[32m[0402 17:04:38 @base.py:272][0m Epoch 19 (global_step 48355) finished, time:14 seconds.
+[32m[0402 17:04:38 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-48355.
+[32m[0402 17:04:38 @monitor.py:428][0m accuracy: 0.86311
+[32m[0402 17:04:38 @monitor.py:428][0m cost: nan
+[32m[0402 17:04:38 @monitor.py:428][0m error: 0.13689
+[32m[0402 17:04:38 @base.py:262][0m Start Epoch 20 ...
+[32m[0402 17:04:54 @base.py:272][0m Epoch 20 (global_step 50900) finished, time:15.6 seconds.
+[32m[0402 17:04:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-50900.
+[32m[0402 17:04:54 @monitor.py:428][0m accuracy: 0.92695
+[32m[0402 17:04:54 @monitor.py:428][0m cost: nan
+[32m[0402 17:04:54 @monitor.py:428][0m error: 0.073054
+[32m[0402 17:04:54 @base.py:262][0m Start Epoch 21 ...
+[32m[0402 17:05:07 @base.py:272][0m Epoch 21 (global_step 53445) finished, time:13.3 seconds.
+[32m[0402 17:05:07 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-53445.
+[32m[0402 17:05:07 @monitor.py:428][0m accuracy: 0.9485
+[32m[0402 17:05:07 @monitor.py:428][0m cost: nan
+[32m[0402 17:05:07 @monitor.py:428][0m error: 0.051498
+[32m[0402 17:05:07 @base.py:262][0m Start Epoch 22 ...
+[32m[0402 17:05:22 @base.py:272][0m Epoch 22 (global_step 55990) finished, time:14.6 seconds.
+[32m[0402 17:05:22 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-55990.
+[32m[0402 17:05:22 @monitor.py:428][0m accuracy: 0.95438
+[32m[0402 17:05:22 @monitor.py:428][0m cost: nan
+[32m[0402 17:05:22 @monitor.py:428][0m error: 0.045622
+[32m[0402 17:05:22 @base.py:262][0m Start Epoch 23 ...
+[32m[0402 17:05:37 @base.py:272][0m Epoch 23 (global_step 58535) finished, time:15.2 seconds.
+[32m[0402 17:05:37 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-58535.
+[32m[0402 17:05:37 @monitor.py:428][0m accuracy: 0.95256
+[32m[0402 17:05:37 @monitor.py:428][0m cost: nan
+[32m[0402 17:05:37 @monitor.py:428][0m error: 0.047443
+[32m[0402 17:05:37 @base.py:262][0m Start Epoch 24 ...
+[32m[0402 17:05:50 @base.py:272][0m Epoch 24 (global_step 61080) finished, time:13.1 seconds.
+[32m[0402 17:05:51 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-61080.
+[32m[0402 17:05:51 @monitor.py:428][0m accuracy: 0.95666
+[32m[0402 17:05:51 @monitor.py:428][0m cost: nan
+[32m[0402 17:05:51 @monitor.py:428][0m error: 0.043345
+[32m[0402 17:05:51 @base.py:262][0m Start Epoch 25 ...
+[32m[0402 17:06:06 @base.py:272][0m Epoch 25 (global_step 63625) finished, time:15.1 seconds.
+[32m[0402 17:06:06 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-63625.
+[32m[0402 17:06:06 @monitor.py:428][0m accuracy: 0.96211
+[32m[0402 17:06:06 @monitor.py:428][0m cost: nan
+[32m[0402 17:06:06 @monitor.py:428][0m error: 0.037886
+[32m[0402 17:06:06 @base.py:262][0m Start Epoch 26 ...
+[32m[0402 17:06:21 @base.py:272][0m Epoch 26 (global_step 66170) finished, time:14.6 seconds.
+[32m[0402 17:06:21 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-66170.
+[32m[0402 17:06:21 @monitor.py:428][0m accuracy: 0.96831
+[32m[0402 17:06:21 @monitor.py:428][0m cost: nan
+[32m[0402 17:06:21 @monitor.py:428][0m error: 0.03169
+[32m[0402 17:06:21 @base.py:262][0m Start Epoch 27 ...
+[32m[0402 17:06:34 @base.py:272][0m Epoch 27 (global_step 68715) finished, time:13.2 seconds.
+[32m[0402 17:06:34 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-68715.
+[32m[0402 17:06:34 @monitor.py:428][0m accuracy: 0.97109
+[32m[0402 17:06:34 @monitor.py:428][0m cost: nan
+[32m[0402 17:06:34 @monitor.py:428][0m error: 0.028909
+[32m[0402 17:06:34 @base.py:262][0m Start Epoch 28 ...
+[32m[0402 17:06:49 @base.py:272][0m Epoch 28 (global_step 71260) finished, time:15.5 seconds.
+[32m[0402 17:06:50 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-71260.
+[32m[0402 17:06:50 @monitor.py:428][0m accuracy: 0.98248
+[32m[0402 17:06:50 @monitor.py:428][0m cost: nan
+[32m[0402 17:06:50 @monitor.py:428][0m error: 0.017517
+[32m[0402 17:06:50 @base.py:262][0m Start Epoch 29 ...
+[32m[0402 17:07:04 @base.py:272][0m Epoch 29 (global_step 73805) finished, time:14.3 seconds.
+[32m[0402 17:07:04 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-73805.
+[32m[0402 17:07:04 @monitor.py:428][0m accuracy: 0.98869
+[32m[0402 17:07:04 @monitor.py:428][0m cost: nan
+[32m[0402 17:07:04 @monitor.py:428][0m error: 0.011306
+[32m[0402 17:07:04 @base.py:262][0m Start Epoch 30 ...
+[32m[0402 17:07:17 @base.py:272][0m Epoch 30 (global_step 76350) finished, time:13.3 seconds.
+[32m[0402 17:07:17 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-76350.
+[32m[0402 17:07:17 @monitor.py:428][0m accuracy: 0.98594
+[32m[0402 17:07:17 @monitor.py:428][0m cost: nan
+[32m[0402 17:07:17 @monitor.py:428][0m error: 0.014065
+[32m[0402 17:07:17 @base.py:262][0m Start Epoch 31 ...
+[32m[0402 17:07:33 @base.py:272][0m Epoch 31 (global_step 78895) finished, time:15.9 seconds.
+[32m[0402 17:07:33 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-78895.
+[32m[0402 17:07:33 @monitor.py:428][0m accuracy: 0.99715
+[32m[0402 17:07:33 @monitor.py:428][0m cost: nan
+[32m[0402 17:07:33 @monitor.py:428][0m error: 0.002852
+[32m[0402 17:07:33 @base.py:262][0m Start Epoch 32 ...
+[32m[0402 17:07:47 @base.py:272][0m Epoch 32 (global_step 81440) finished, time:13.8 seconds.
+[32m[0402 17:07:48 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-81440.
+[32m[0402 17:07:48 @monitor.py:428][0m accuracy: 0.99717
+[32m[0402 17:07:48 @monitor.py:428][0m cost: nan
+[32m[0402 17:07:48 @monitor.py:428][0m error: 0.0028344
+[32m[0402 17:07:48 @base.py:262][0m Start Epoch 33 ...
+[32m[0402 17:08:02 @base.py:272][0m Epoch 33 (global_step 83985) finished, time:14.2 seconds.
+[32m[0402 17:08:02 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-83985.
+[32m[0402 17:08:02 @monitor.py:428][0m accuracy: 0.9994
+[32m[0402 17:08:02 @monitor.py:428][0m cost: nan
+[32m[0402 17:08:02 @monitor.py:428][0m error: 0.00059977
+[32m[0402 17:08:02 @base.py:262][0m Start Epoch 34 ...
+[32m[0402 17:08:18 @base.py:272][0m Epoch 34 (global_step 86530) finished, time:15.6 seconds.
+[32m[0402 17:08:18 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-86530.
+[32m[0402 17:08:18 @monitor.py:428][0m accuracy: 0.9994
+[32m[0402 17:08:18 @monitor.py:428][0m cost: nan
+[32m[0402 17:08:18 @monitor.py:428][0m error: 0.0005986
+[32m[0402 17:08:18 @base.py:262][0m Start Epoch 35 ...
+[32m[0402 17:08:31 @base.py:272][0m Epoch 35 (global_step 89075) finished, time:13.2 seconds.
+[32m[0402 17:08:31 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-89075.
+[32m[0402 17:08:31 @monitor.py:428][0m accuracy: 0.9994
+[32m[0402 17:08:31 @monitor.py:428][0m cost: nan
+[32m[0402 17:08:31 @monitor.py:428][0m error: 0.0005986
+[32m[0402 17:08:31 @base.py:262][0m Start Epoch 36 ...
+[32m[0402 17:08:46 @base.py:272][0m Epoch 36 (global_step 91620) finished, time:14.9 seconds.
+[32m[0402 17:08:46 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-91620.
+[32m[0402 17:08:46 @monitor.py:428][0m accuracy: 0.99942
+[32m[0402 17:08:46 @monitor.py:428][0m cost: nan
+[32m[0402 17:08:46 @monitor.py:428][0m error: 0.00058016
+[32m[0402 17:08:46 @base.py:262][0m Start Epoch 37 ...
+[32m[0402 17:09:01 @base.py:272][0m Epoch 37 (global_step 94165) finished, time:14.9 seconds.
+[32m[0402 17:09:01 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-94165.
+[32m[0402 17:09:01 @monitor.py:428][0m accuracy: 0.99942
+[32m[0402 17:09:01 @monitor.py:428][0m cost: nan
+[32m[0402 17:09:01 @monitor.py:428][0m error: 0.00058016
+[32m[0402 17:09:01 @base.py:262][0m Start Epoch 38 ...
+[32m[0402 17:09:14 @base.py:272][0m Epoch 38 (global_step 96710) finished, time:13.2 seconds.
+[32m[0402 17:09:15 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-96710.
+[32m[0402 17:09:15 @monitor.py:428][0m accuracy: 0.99942
+[32m[0402 17:09:15 @monitor.py:428][0m cost: nan
+[32m[0402 17:09:15 @monitor.py:428][0m error: 0.00058122
+[32m[0402 17:09:15 @base.py:262][0m Start Epoch 39 ...
+[32m[0402 17:09:30 @base.py:272][0m Epoch 39 (global_step 99255) finished, time:15.3 seconds.
+[32m[0402 17:09:30 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-99255.
+[32m[0402 17:09:30 @monitor.py:428][0m accuracy: 0.99942
+[32m[0402 17:09:30 @monitor.py:428][0m cost: nan
+[32m[0402 17:09:30 @monitor.py:428][0m error: 0.00058016
+[32m[0402 17:09:30 @base.py:262][0m Start Epoch 40 ...
+[32m[0402 17:09:44 @base.py:272][0m Epoch 40 (global_step 101800) finished, time:14.5 seconds.
+[32m[0402 17:09:44 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-101800.
+[32m[0402 17:09:44 @monitor.py:428][0m accuracy: 0.99942
+[32m[0402 17:09:44 @monitor.py:428][0m cost: nan
+[32m[0402 17:09:44 @monitor.py:428][0m error: 0.00058378
+[32m[0402 17:09:44 @base.py:262][0m Start Epoch 41 ...
+[32m[0402 17:09:58 @base.py:272][0m Epoch 41 (global_step 104345) finished, time:13.1 seconds.
+[32m[0402 17:09:58 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-104345.
+[32m[0402 17:09:58 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:09:58 @monitor.py:428][0m cost: nan
+[32m[0402 17:09:58 @monitor.py:428][0m error: 0.00010076
+[32m[0402 17:09:58 @base.py:262][0m Start Epoch 42 ...
+[32m[0402 17:10:13 @base.py:272][0m Epoch 42 (global_step 106890) finished, time:15.6 seconds.
+[32m[0402 17:10:13 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-106890.
+[32m[0402 17:10:13 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:10:13 @monitor.py:428][0m cost: nan
+[32m[0402 17:10:13 @monitor.py:428][0m error: 0.00010182
+[32m[0402 17:10:13 @base.py:262][0m Start Epoch 43 ...
+[32m[0402 17:10:28 @base.py:272][0m Epoch 43 (global_step 109435) finished, time:14.2 seconds.
+[32m[0402 17:10:28 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-109435.
+[32m[0402 17:10:28 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:10:28 @monitor.py:428][0m cost: nan
+[32m[0402 17:10:28 @monitor.py:428][0m error: 9.9257e-05
+[32m[0402 17:10:28 @base.py:262][0m Start Epoch 44 ...
+[32m[0402 17:10:41 @base.py:272][0m Epoch 44 (global_step 111980) finished, time:13.5 seconds.
+[32m[0402 17:10:41 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-111980.
+[32m[0402 17:10:41 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 17:10:41 @monitor.py:428][0m cost: nan
+[32m[0402 17:10:41 @monitor.py:428][0m error: 0.00011764
+[32m[0402 17:10:41 @base.py:262][0m Start Epoch 45 ...
+[32m[0402 17:10:57 @base.py:272][0m Epoch 45 (global_step 114525) finished, time:16.1 seconds.
+[32m[0402 17:10:57 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-114525.
+[32m[0402 17:10:57 @monitor.py:428][0m accuracy: 0.99992
+[32m[0402 17:10:57 @monitor.py:428][0m cost: nan
+[32m[0402 17:10:57 @monitor.py:428][0m error: 8.2373e-05
+[32m[0402 17:10:57 @base.py:262][0m Start Epoch 46 ...
+[32m[0402 17:11:11 @base.py:272][0m Epoch 46 (global_step 117070) finished, time:13.6 seconds.
+[32m[0402 17:11:11 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-117070.
+[32m[0402 17:11:11 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:11:11 @monitor.py:428][0m cost: nan
+[32m[0402 17:11:11 @monitor.py:428][0m error: 0.00010076
+[32m[0402 17:11:11 @base.py:262][0m Start Epoch 47 ...
+[32m[0402 17:11:25 @base.py:272][0m Epoch 47 (global_step 119615) finished, time:14.2 seconds.
+[32m[0402 17:11:25 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-119615.
+[32m[0402 17:11:25 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:11:25 @monitor.py:428][0m cost: nan
+[32m[0402 17:11:25 @monitor.py:428][0m error: 9.9257e-05
+[32m[0402 17:11:25 @base.py:262][0m Start Epoch 48 ...
+[32m[0402 17:11:41 @base.py:272][0m Epoch 48 (global_step 122160) finished, time:15.7 seconds.
+[32m[0402 17:11:41 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-122160.
+[32m[0402 17:11:41 @monitor.py:428][0m accuracy: 0.99992
+[32m[0402 17:11:41 @monitor.py:428][0m cost: nan
+[32m[0402 17:11:41 @monitor.py:428][0m error: 8.2373e-05
+[32m[0402 17:11:41 @base.py:262][0m Start Epoch 49 ...
+[32m[0402 17:11:54 @base.py:272][0m Epoch 49 (global_step 124705) finished, time:13.1 seconds.
+[32m[0402 17:11:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-124705.
+[32m[0402 17:11:54 @monitor.py:428][0m accuracy: 0.99992
+[32m[0402 17:11:54 @monitor.py:428][0m cost: nan
+[32m[0402 17:11:54 @monitor.py:428][0m error: 8.2041e-05
+[32m[0402 17:11:54 @base.py:262][0m Start Epoch 50 ...
+[32m[0402 17:12:09 @base.py:272][0m Epoch 50 (global_step 127250) finished, time:14.9 seconds.
+[32m[0402 17:12:09 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-127250.
+[32m[0402 17:12:09 @monitor.py:428][0m accuracy: 0.99992
+[32m[0402 17:12:09 @monitor.py:428][0m cost: nan
+[32m[0402 17:12:09 @monitor.py:428][0m error: 8.1369e-05
+[32m[0402 17:12:09 @base.py:262][0m Start Epoch 51 ...
+[32m[0402 17:12:24 @base.py:272][0m Epoch 51 (global_step 129795) finished, time:15 seconds.
+[32m[0402 17:12:24 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-129795.
+[32m[0402 17:12:24 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:12:24 @monitor.py:428][0m cost: nan
+[32m[0402 17:12:24 @monitor.py:428][0m error: 9.9638e-05
+[32m[0402 17:12:24 @base.py:262][0m Start Epoch 52 ...
+[32m[0402 17:12:37 @base.py:272][0m Epoch 52 (global_step 132340) finished, time:13.2 seconds.
+[32m[0402 17:12:39 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-132340.
+[32m[0402 17:12:39 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 17:12:39 @monitor.py:428][0m cost: nan
+[32m[0402 17:12:39 @monitor.py:428][0m error: 0.00011514
+[32m[0402 17:12:39 @base.py:262][0m Start Epoch 53 ...
+[32m[0402 17:12:54 @base.py:272][0m Epoch 53 (global_step 134885) finished, time:15.4 seconds.
+[32m[0402 17:12:54 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-134885.
+[32m[0402 17:12:54 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:12:54 @monitor.py:428][0m cost: nan
+[32m[0402 17:12:54 @monitor.py:428][0m error: 0.00010136
+[32m[0402 17:12:54 @base.py:262][0m Start Epoch 54 ...
+[32m[0402 17:13:09 @base.py:272][0m Epoch 54 (global_step 137430) finished, time:14.4 seconds.
+[32m[0402 17:13:09 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-137430.
+[32m[0402 17:13:09 @monitor.py:428][0m accuracy: 0.9999
+[32m[0402 17:13:09 @monitor.py:428][0m cost: nan
+[32m[0402 17:13:09 @monitor.py:428][0m error: 9.9315e-05
+[32m[0402 17:13:09 @base.py:262][0m Start Epoch 55 ...
+[32m[0402 17:13:22 @base.py:272][0m Epoch 55 (global_step 139975) finished, time:13.2 seconds.
+[32m[0402 17:13:23 @saver.py:84][0m Model saved to /graphics/projects/scratch/student_datasets/cgpraktikum17/deep-sequences/train_log/schulte/rnn/model-139975.
+[32m[0402 17:13:23 @monitor.py:428][0m accuracy: 0.99988
+[32m[0402 17:13:23 @monitor.py:428][0m cost: nan
+[32m[0402 17:13:23 @monitor.py:428][0m error: 0.00011619
+[32m[0402 17:13:23 @base.py:262][0m Start Epoch 56 ...
+[32m[0402 17:13:32 @base.py:280][0m Detected Ctrl-C and exiting main loop.
