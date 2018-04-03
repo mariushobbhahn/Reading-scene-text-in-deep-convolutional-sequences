@@ -32,7 +32,7 @@ def test(path, cnn_model, rnn_model):
         print("Failed to load image!")
         exit()
 
-    feats = list(cnn.predict_features(img, step_size=8))
+    feats = list(cnn.predict_features(img, step_size=2))
     label = rnn.predict_label(feats)
 
     print("Label: {}".format(label))
