@@ -5,6 +5,7 @@ import config
 
 
 from cnn.train import train
+from cnn.resnet import train_resnet
 from cnn.test import test
 from rnn.train_rnn import train_rnn
 
@@ -27,6 +28,7 @@ def main(argv):
 
     parser.add_argument('--test', help='predicts the characters in the image at the given path')
     parser.add_argument('--train-rnn', dest='train_rnn', action='store_true', help="trains the rnn")
+    parser.add_argument('--train-resnet', dest='train_resnet', action='store_true', help="trains the resnet as cnn")
     parser.add_argument('--step-size', dest='step_size', help="step size for the sliding window rnn")
 
 
@@ -52,6 +54,10 @@ def main(argv):
                   unique=args.unique or False,
                   sub_data=int(args.sub_data) if args.sub_data else None,
                   batch_size=int(args.batch_size) if args.batch_size else 1)
+    elif args.train_resnet:
+        train_resnet(unique=args.unique or False,
+            sub_data=int(args.sub_data) if args.sub_data else None,
+            batch_size=int(args.batch_size) if args.batch_size else 128)
     else:
         # start training
         train(unique=args.unique or False,
