@@ -9,7 +9,7 @@ import tensorpack as tp
 from cnn.train import train
 from cnn.resnet import train_resnet
 from cnn.test import test
-from rnn.train_rnn import train_rnn
+from rnn.train_rnn import train_rnn, train_rnn_ensemble
 
 
 def main(argv):
@@ -30,6 +30,7 @@ def main(argv):
 
     parser.add_argument('--test', help='predicts the characters in the image at the given path')
     parser.add_argument('--train-rnn', dest='train_rnn', action='store_true', help="trains the rnn")
+    parser.add_argument('--train-rnn-ensemble', dest='train_rnn_ensemble', action='store_true', help="trains the rnn")
     parser.add_argument('--train-resnet', dest='train_resnet', action='store_true', help="trains the resnet as cnn")
     parser.add_argument('--step-size', dest='step_size', help="step size for the sliding window rnn")
 
@@ -44,7 +45,9 @@ def main(argv):
     config.DUMP_DIR = os.path.join(config.RES_DIR, 'dump') if args.dump else None
 
     model = args.load or os.path.join(config.RES_DIR, 'cnn_model/max-validation_accuracy')
-
+    ## ensemble cnn models, save in res/cnnmodels_temp/..
+    model_indices = ["03","04","05"]
+    models = [os.path.join(config.RES_DIR, 'cnnmodels_temp/{}/max-validation_accuracy'.format(x)) for x in model_indices]
     rnn_model = os.path.join(config.RES_DIR, 'rnn_model/model-386840')
 
     if args.test:
@@ -52,6 +55,13 @@ def main(argv):
     elif args.train_rnn:
         step_size = args.step_size if args.step_size else 8
         train_rnn(model,
+                  step_size,
+                  unique=args.unique or False,
+                  sub_data=int(args.sub_data) if args.sub_data else None,
+                  batch_size=int(args.batch_size) if args.batch_size else 1)
+    elif args.train_rnn_ensemble:
+        step_size = args.step_size if args.step_size else 8
+        train_rnn_ensemble(models,
                   step_size,
                   unique=args.unique or False,
                   sub_data=int(args.sub_data) if args.sub_data else None,

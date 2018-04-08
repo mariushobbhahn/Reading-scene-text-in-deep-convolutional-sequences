@@ -12,7 +12,7 @@ from tensorflow.python.platform import flags
 from cnn.network import CharacterPredictor
 from data.iiit5k import IIIT5K
 from data.dataset import *
-from data.predicted import PredictFeatures
+from data.predicted import PredictFeatures, MultiPredictFeatures
 from rnn.rnn_network import *
 
 
@@ -25,12 +25,12 @@ def length(sequence):
 
 
 class TrainRNNModel(ModelDesc):
-    def __init__(self, max_length=36):
+    def __init__(self, max_length=36, predictors=1):
         self.max_length = max_length
-        self.input_vector_size = 128
+        self.input_vector_size = 128*predictors
 
     def inputs(self):
-        return [tf.placeholder(tf.float32, [None, None, 128], 'feat'),  # features
+        return [tf.placeholder(tf.float32, [None, None, self.input_vector_size], 'feat'),  # features
                 tf.placeholder(tf.int64, [None, None], 'labelidx'),  # label is b x maxlen, sparse
                 tf.placeholder(tf.int32, [None], 'labelvalue'),
                 tf.placeholder(tf.int64, [None], 'labelshape'),
@@ -109,14 +109,14 @@ class TrainRNNModel(ModelDesc):
 
 
 
-def get_config(data, max_epoch=1500, run_inference=True):
+def get_config(data, max_epoch=1500, run_inference=True, num_predictors=1):
     dataset_test, dataset_train = data
 
     # How many iterations you want in each epoch.
     # This is the default value, don't actually need to set it in the config
     steps_per_epoch = dataset_train.size()
 
-    model = TrainRNNModel()
+    model = TrainRNNModel(predictors=num_predictors)
     model.steps_per_epoch = steps_per_epoch
     model.max_epoch = max_epoch
 
@@ -131,7 +131,7 @@ def get_config(data, max_epoch=1500, run_inference=True):
         callbacks.append(
             InferenceRunner(    # run inference(for validation) after every epoch
                 dataset_test,   # the DataFlow instance used for validation
-                ScalarStats(['cost', 'error'])))
+                ScalarStats(['cost', 'accuracy'])))
 
     # get the config which contains everything necessary in a training
     return TrainConfig(
@@ -144,14 +144,18 @@ def get_config(data, max_epoch=1500, run_inference=True):
     )
 
 
-def get_data(model, step_size, unique, sub_data, batch_size):
+def get_data(model, step_size, unique, sub_data, batch_size, multi=False):
     ds_train = data.utils.load_lmdb(IIIT5K('train', unique=unique))
     ds_test = data.utils.load_lmdb(IIIT5K('test', unique=unique))
 
-    predictor = CharacterPredictor(model)
-
-    ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
-    ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
+    if multi:
+        predictors = [CharacterPredictor(m) for m in model]
+        ds_train = MultiPredictFeatures(ds_train, predictors, step_size=step_size)
+        ds_test = MultiPredictFeatures(ds_test, predictors, step_size=step_size)
+    else:
+        predictor = CharacterPredictor(model)
+        ds_train = PredictFeatures(ds_train, predictor, step_size=step_size)
+        ds_test = PredictFeatures(ds_test, predictor, step_size=step_size)
 
     ds_train.name = "IIIT5K_train_features_{}".format(step_size)
     ds_test.name = "IIIT5K_test_features_{}".format(step_size)
@@ -201,6 +205,26 @@ def train_rnn(model, step_size, unique, sub_data, batch_size):
 
 
     config = get_config(data, run_inference=True)
+
+    # TODO change trainer
+    launch_train_with_config(config, SimpleTrainer())
+    
+def train_rnn_ensemble(models, step_size, unique, sub_data, batch_size):
+
+    # automatically setup the directory for logging
+    logger.set_logger_dir(os.path.join(cfg.TRAIN_LOG_DIR, "rnn"))
+
+    data = (ds_train, ds_test) = get_data(models, step_size, unique, sub_data, batch_size, multi=True)
+
+    max_length = 0
+
+    # for (features, label) in ds_test.get_data():
+    #     if len(features) > max_length:
+    #         max_length = len(features)
+    #         print("Max len: {}".format(max_length))
+
+
+    config = get_config(data, run_inference=True, num_predictors=len(models))
 
     # TODO change trainer
     launch_train_with_config(config, SimpleTrainer())

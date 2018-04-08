@@ -87,7 +87,7 @@ class TrainCNNModel(ModelDesc):
 #        tf.summary.scalar('lr', lr)
 
 #        return tf.train.AdamOptimizer(lr)
-        return tf.train.AdamOptimizer(2e-4)
+        return tf.train.AdamOptimizer(5e-4)
 
 
 def get_data(unique=False, sub_data=None, batch_size=128):
