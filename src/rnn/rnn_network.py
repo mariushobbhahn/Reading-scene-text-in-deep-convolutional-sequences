@@ -3,7 +3,26 @@ from tensorpack import *
 import tensorflow as tf
 import numpy as np
 
-rnn = tf.contrib.rnn
+import string
+
+import tensorflow.contrib.rnn as rnn
+
+import tensorflow as tf
+import numpy as np
+
+# Just import everything into current namespace
+from tensorpack import *
+from tensorpack.tfutils import summary
+from tensorpack.models.nonlin import Maxout
+from tensorflow.python.platform import flags
+
+from tensorpack.predict import OfflinePredictor, PredictConfig
+from data.utils import int_label_to_char
+
+# from tensorflow.python.layers import maxout
+from data.utils import convert_image_to_array
+
+
 
 """
 Explanation:
@@ -18,40 +37,94 @@ Each probability-vector contains 128 probabilities for a given character.
 Due to the unsegmented nature of the word image at the character level, the length of the LSTM outputs is not consistent with the length of a target word string.
 We therefore apply the CTC approach to make reasonable character sequences out of the probability-vector (see https://www.tensorflow.org/versions/r0.12/api_docs/python/nn/connectionist_temporal_classification__ctc_)
 
-The output of the CTC is then returned
+The output of the LSTM is then given into the CTC. (This happens in the train class though)
 """
 
-"""
-TODOs:
-
-- where do the probability vectors come from?
-- implement CTC
-"""
-
-input = [] #sequence of vectors (128d)
-frame_size = 128 #len(input[0])
-batch_size = 1 #sollte tf irgendwann für uns regeln gibt die Zahl an parallelen Prozessen an
-
-lstm1 = tf.contrib.rnn.BasicLSTMCell(frame_size)
-lstm2 = tf.contrib.rnn.BasicLSTMCell(frame_size)
 
 
-hidden_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
-current_state_1 = tf.zeros([frame_size, lstm1.state_size[0]])
-state_1 = hidden_state_1, current_state_1
-
-#hidden_state_2, current_state_2, state_2 = hidden_state_1, current_state_1, state_1
+"""RNN: 128LSTM_cells per layer, fully connected 37 neuron layer in the end"""
 
 
-for i in range(batch_size):
-    # The value of state is updated after processing each batch of words.
-    output_1, state_1 = lstm1(input[i], state_1)
-    #output_2, state_2 = lstm2(input[len(input) - i], state_2)
-
-    softmax_c = tf.nn.softmax(output_1) #softmax on the
-    logits = tf.matmul(output_1, softmax_c) #fully connected layer
-    probabilities.append(tf.nn.softmax(logits))
-    #there is no loss function, since at this point we do not have a reasonable comparison
 
 
-#now we need to take our CTC and let it run over the probability vectors
+
+def build_rnn(inputs, sequence_length):
+    """Constants:"""
+
+    # inputs = tf.expand_dims(inputs, 3)
+    num_lstm = 128  # as described in the paper
+
+    """RNN Cells"""
+    # bidirectional LSTM with 128 layers each
+    # (outputs, _, _) = rnn.stack_bidirectional_rnn(
+    #    cells_fw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
+    #    cells_bw=[rnn.BasicLSTMCell(num_units=num_LSTMs_per_layer, activation=tf.nn.tanh)],
+    #    inputs=[input],
+    #    dtype=tf.float32
+    # )
+
+    outputs, _ = tf.nn.bidirectional_dynamic_rnn(rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh),
+                                                 rnn.BasicLSTMCell(num_units=num_lstm, activation=tf.nn.tanh),
+                                                 inputs,
+                                                 sequence_length=sequence_length,
+                                                 dtype=tf.float32)
+
+
+    # Concatenate outputs from fw and bw layer
+    logits = tf.concat(outputs, 2)
+    # print("RNN output shape: {}".format(logits.shape))
+
+
+    # Logits contains the predicted character for every 36 possible frames.
+    logits = tf.contrib.layers.fully_connected(
+        inputs=logits,
+        num_outputs=37,  # these are the 36 characters plus the symbol for no character
+        activation_fn=tf.identity,
+        weights_initializer=tf.truncated_normal_initializer(stddev=0.01))
+    
+#    logits = tf.Print(logits, [logits], summarize=64)
+
+    # print("FC shape: {}".format(logits.shape))
+
+    ## ctc loss requires un-softmaxed logits
+    # """softmax as described in the paper"""
+    # logits = tf.nn.softmax(logits, name='final_logits')
+
+    return logits
+
+def _tower_func(features, seqlen):
+    logits = build_rnn(features, seqlen)
+    # transpose to fit major_time
+    logits = tf.transpose(logits, (1, 0, 2))
+
+    logits = tf.to_int32(tf.nn.ctc_beam_search_decoder(logits, seqlen)[0][0], name='prediction')
+
+    return logits
+
+
+
+
+
+class FeaturePredictor(OfflinePredictor):
+    def __init__(self, model):
+        config = PredictConfig(
+            inputs_desc=[InputDesc(tf.float32, (None, None, 128), 'features'),
+                         InputDesc(tf.int32, (None,), 'length')],
+            tower_func=_tower_func,
+            session_init=SaverRestore(model),
+            input_names=['features', 'length'],
+            output_names=['prediction'])
+
+        super(FeaturePredictor, self).__init__(config)
+
+    def predict(self, feature_list):
+        length = len(feature_list)
+        l = np.array([length]).reshape((1,)).astype('int32')
+        feats = np.array(feature_list).reshape((1, length, 128)).astype('float32')
+
+        return self(feats, l)[0]
+
+    def predict_label(self, feature_list):
+        int_labels = self.predict(feature_list)
+        chars = [int_label_to_char(k) for k in int_labels]
+        return ''.join(chars).upper()

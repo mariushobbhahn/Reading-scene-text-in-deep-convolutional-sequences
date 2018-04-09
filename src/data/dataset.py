@@ -1,92 +1,24 @@
-import os
-import config
-import cv2
 import itertools
 
+import numpy as np
 from tensorpack.dataflow import *
-from data.iiit5k import IIIT5KHelper
-from tensorpack.dataflow.base import RNGDataFlow
+from tensorpack.dataflow.base import DataFlow, ProxyDataFlow
 from tensorpack.dataflow.dftools import dump_dataflow_to_lmdb
+import data.utils
 
-
-unique_selectors = [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-def _lmdb_file(name, train_or_test, char_data):
-    str = "_chars" if char_data else ""
-    return name + "_" + train_or_test + str + ".lmdb"
-
-
-def _lmdb_path(name, train_or_test, char_data):
-    return os.path.join(config.DATA_DIR, _lmdb_file(name, train_or_test, char_data))
-
-
-def _load_or_create_ds(helper, shuffle):
+class SubData(DataFlow):
     """
-    Uses a heper data set to load or create a lmdb data set.
-    :param helper: Helper data set to create lmdb if needed.
-    :param shuffle: If `true` the returned dataset will be shuffled.
-    :return: A lmdb data set
+        DataFlow wrapper which only contains a subset of the wrapped data points.
     """
-    path = _lmdb_path(helper.name, helper.train_or_test, helper.is_char_data)
-
-    # remove lmdb if needed
-    if config.REMOVE_LMDB:
-        os.remove(path)
-
-    # Check if lmdb exists
-    if not os.path.exists(path):
-        dump_dataflow_to_lmdb(helper, path)
-
-    # Load lmdb
-    ds = LMDBData(path, shuffle=False)
-
-    # shuffle if needed
-    if shuffle:
-        ds = LocallyShuffleData(ds, 50000)
-
-    # ds = PrefetchData(ds, 5000, 1)
-
-    # Decode images
-    ds = LMDBDataPoint(ds)
-    ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
-    # ds = PrefetchDataZMQ(ds, 25)
-
-    return ds
-
-
-def dump_helper(helper, output_dir=None, count=100, step=1):
-    """
-    Dumps the given amout of images form the helper data.
-
-    :param helper:
-    :param output_dir:
-    :param count:
-    :return:
-    """
-    if output_dir is None:
-        s = "_char" if helper.is_char_data else ""
-        output_dir = os.path.join(config.DATA_DIR, "dump_{}_{}{}".format(helper.name, helper.train_or_test, s))
-
-    data = itertools.islice(helper.get_data(), 0, count * step, step)
-
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
-    print("Dump to {}".format(output_dir))
-
-    for raw, label in data:
-        img = cv2.imdecode(raw, cv2.IMREAD_GRAYSCALE)
-        file = os.path.join(output_dir, "{}.png".format(label))
-        cv2.imwrite(file, img)
-
-
-class SubData(RNGDataFlow):
-    def __init__(self, data, count, start=0, step=8):
+    def __init__(self, data, count, start=0, step=1):
         self.start = start
         self.step = step
-        self.data = data
-        self.all_data = all_data
         self.count = count
+        self.data = data
         self.reset_state()
+
+    def reset_state(self):
+        self.data.reset_state()
 
     def get_data(self):
         elem = itertools.islice(self.data.get_data(), self.start, self.start + self.count * self.step, self.step)
@@ -96,37 +28,116 @@ class SubData(RNGDataFlow):
     def size(self):
         return self.count
 
-class UniqueData(RNGDataFlow):
+
+class UniqueData(DataFlow):
+    """
+        DataFlow wrapper which contains one data point per label.
+    """
     def __init__(self, data):
         self.data = data
+        # Count will be init lazy
+        self.count = None
+        self.reset_state()
+
+    def reset_state(self):
+        self.data.reset_state()
 
     def get_data(self):
         """
-            returns a set of 36 elements, one from each class.
-            Therefore, the params are hard-coded (as the places of the characters were manually determined)
+            yields one data point per label.
         """
-        start = 16
-        count = 2048
-        elem = itertools.islice(self.data.get_data(), start, start + count) # get the first 2048 chars
-        elem = itertools.compress(elem, unique_selectors) # select only one character from each class
-        for img, label in elem:
-            yield [img, label]
+        self.reset_state()
+        known_labels = set()
+        index = 0
+        lastindex = -10
+
+        for img, label in self.data.get_data():
+            index = index + 1
+            if label not in known_labels and index > lastindex + 6:
+                known_labels.add(label)
+                yield [img, label]
 
     def size(self):
+        if self.count is None:
+            # count data points
+            self.count = sum(1 for _ in self.get_data())
+
         return self.count
 
-def IIIT5K(train_or_test, char_data=False, shuffle=False):
-    """
-    Creates or loads the IIIT5K data set.
 
-    :param train_or_test: controls which subset is loaded.
-    :param char_data: if 'True' a version of the data set for character recognition is loaded.
-    :param shuffle: if `True` the elements of the data set will be shuffled.
-    :return:
-    """
-    helper = IIIT5KHelper(train_or_test, char_data)
+def _batch_feature(feats):
+    # pad to the longest in the batch
+    maxlen = max([k.shape[0] for k in feats])
+    bsize = len(feats)
+    ret = np.zeros((bsize, maxlen, feats[0].shape[1]))
+    for idx, feat in enumerate(feats):
+        ret[idx, :feat.shape[0], :] = feat
+    return ret
 
-    if config.DUMP_DATABASES:
-        dump_helper(helper, count=3, step=8)
 
-    return _load_or_create_ds(helper, shuffle)
+def _sparse_label(labels):
+    batchsize = len(labels)
+    maxlen = max([len(label) for label in labels])
+
+    shape = (batchsize, maxlen)
+    indices = []
+    values = []
+
+    current_batch = 0
+
+    for batch, label in enumerate(labels):
+
+        for idx, char in enumerate(label):
+            indices.append([batch, idx])
+            values.append(data.utils.char_to_int_label(char))
+
+    indices = np.asarray(indices)
+    values = np.asarray(values)
+    return (indices, values, shape)
+
+
+class _FilterFeatures(ProxyDataFlow):
+    def __init__(self, ds):
+        self.ds = ds
+
+    def size(self):
+        return len(list(self.get_data()))
+
+    def get_data(self):
+        for features, label in self.ds.get_data():
+            if len(label) <= features.shape[0]:
+                yield features, label
+
+
+class BatchedFeatures(ProxyDataFlow):
+
+    def __init__(self, ds, batch):
+        self.batch = batch
+        self.ds = _FilterFeatures(ds)
+
+    def size(self):
+        return self.ds.size() // self.batch
+
+    def get_data(self):
+        itr = self.ds.get_data()
+        for _ in range(self.size()):
+            feats = []
+            labs = []
+            seqlen = []
+
+            for b in range(self.batch):
+                feat, lab = next(itr)
+
+                # print("Bacth label {} with {} features".format(lab, feat.shape[0]))
+                feats.append(feat)
+                labs.append(lab)
+                seqlen.append(feat.shape[0])
+
+            batchfeat = _batch_feature(feats)
+            batchlab = _sparse_label(labs)
+            seqlen = np.asarray(seqlen)
+
+            # print("Process label: {}".format(labs[0]))
+            # print("Features: {}, label: {}".format(batchfeat.shape, batchlab))
+            # print("Yield batch with len {}".format(seqlen))
+            yield [batchfeat, batchlab[0], batchlab[1], batchlab[2], seqlen]

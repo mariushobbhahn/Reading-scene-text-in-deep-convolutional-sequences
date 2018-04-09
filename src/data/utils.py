@@ -4,9 +4,10 @@ import cv2
 import numpy as np
 import shutil
 
+
 from tensorpack.dataflow.dftools import *
 from tensorpack.dataflow import *
-from data.sub_data import SubData
+from data.dataset import SubData
 
 
 def char_to_int_label(char):
@@ -50,7 +51,7 @@ def load_lmdb(named_df):
     :return: A LMDBDataFlow which contains the same data points as the named df.
     """
     # The path where the .mdb file should be located
-    mdb_file = os.path.join(config.DATA_DIR, named_df.get_name() + ".mdb")
+    mdb_file = os.path.join(config.DATA_DIR, named_df.name + ".mdb")
 
     # remove old file to force recreation
     if config.REMOVE_LMDB and os.path.exists(mdb_file):
@@ -65,7 +66,7 @@ def load_lmdb(named_df):
         print("Done")
 
     # Load lmdb and convert data points to images
-    ds = LMDBData(mdb_file)
+    ds = LMDBData(mdb_file, shuffle=False)
     ds = LMDBDataPoint(ds)
     ds = MapDataComponent(ds, lambda x: cv2.imdecode(x, cv2.IMREAD_GRAYSCALE), 0)
 
@@ -81,7 +82,7 @@ def convert_image_to_array(img):
         raise RuntimeError("Failed to convert image to png!")
 
 
-def dump_data(df, dir, count=100, start=0, step=1):
+def dump_data(df, dir, count=150, start=0, step=1):
     """
     Dumps part of the given data flow into the given dir.
     The files will be named "{index}_{label}.png" where label is the human-readable character.
@@ -104,6 +105,7 @@ def dump_data(df, dir, count=100, start=0, step=1):
 
     for (img, label) in df.get_data():
         char = int_label_to_char(label)
+        # img = img.astype(int)
 
         file = os.path.join(dir, "{}_{}.png".format(index, char))
         index += 1

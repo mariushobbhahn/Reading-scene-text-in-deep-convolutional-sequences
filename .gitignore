@@ -1,8 +1,16 @@
+# Ignore locks
+report/graphics/*lock*
+
 #ignore secret
 .secret
 
 # ignore data
 res/data/
+res/dump/
+res/train_log/
+res/cnn_model/
+res/cnn_model/schulte*
+cnnmodels_temp/
 
 # ignore logs
 src/train_log/

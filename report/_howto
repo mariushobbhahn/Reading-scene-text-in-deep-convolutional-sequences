@@ -1,0 +1,4 @@
+$ pdflatex reportTemplate.tex 
+$ bibtex reportTemplate.tex 
+$ pdflatex reportTemplate.tex 
+$ pdflatex reportTemplate.tex 

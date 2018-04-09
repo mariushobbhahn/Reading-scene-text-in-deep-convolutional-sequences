@@ -5,7 +5,7 @@ DIR=$(dirname $(realpath $0))
 source "$DIR/.secret"
 
 # The computer of cgpool
-POOL=3
+POOL=1
 
 CGPOOL="$LOGIN@cgpool120$POOL.informatik.uni-tuebingen.de"
 CGCONTACT="$LOGIN@cgcontact.informatik.uni-tuebingen.de"
