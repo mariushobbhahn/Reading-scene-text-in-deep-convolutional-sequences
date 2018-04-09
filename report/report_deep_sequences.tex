@@ -130,13 +130,18 @@ The convolutional layer were implemented using the \texttt{conv2D()} function pr
 	\caption{\label{fig:impl_maxgroup} Example of a MaxGroup with group size 4. Essentially Max-Pooling in the "Channel" dimension}
 \end{figure}
 
-For the training, we use a learning rate with exponential decay starting at 0.001 with decay rate of 0.99 and getting smaller every 5 epochs. As an optimizer, we chose the \texttt{AdamOptimizer()} after~\cite{Adam} and used the prebuilt \texttt{InferenceRunner()} from tensorpack to check for validation accuracy on a test set and prevent overfitting. In total, we trained for 1500 epochs and use the prebuilt \texttt{SimpleTrainer()} from tensorpack. 
+For the training, we use a learning rate with exponential decay starting at 0.001 with decay rate of 0.99 and getting smaller every 5 epochs. As an optimizer, we chose the \texttt{AdamOptimizer()} after~\cite{Adam} and used the prebuilt \texttt{InferenceRunner()} from tensorpack to check for validation accuracy on a test set and prevent overfitting. In total, we trained for 1500 epochs and use the prebuilt \texttt{SimpleTrainer()} from tensorpack.
+
 
 \subsection{Implementation details of the RNN}
 The RNN is implemented using the prebuilt tensorflow functions \texttt{tf.nn.bidirectional\_dynamic\_rnn} with \texttt{tf.nn.BasicLSTMCell} for both directions. We use 128 LSTM units (see~\cite{lstmpaper}) as described in the original paper and the default for LSTMs - tanh (\textit{tangens hyperbolicus}) - as activation function. The final output of the RNN in each step (of the sequence) is computed by a fully connected layer mapping the LSTM outputs to the 37 class labels.
 %this text is really redundant so far %besser? ~Jan
 The CTC exists prebuilt as well. For the loss we use the \texttt{tf.nn.ctc\_loss} and \texttt{tf.nn.ctc\_greedy\_decoder} for the model. The greedy decoder is a variant of the \texttt{tf.nn.ctc\_beam\_search\_decoder} function that is faster but less accurate. For our training, the beam search decoder was too slow and in comparison did not add any visible improvements during the first couple of steps in training which lead us to using the greedy decoder. The beam search decoder can however be used at test time to improve accuracy\\
 For the training we again use the Adam optimizer with a learning rate of 1e-4 and a momentum term of 0.9 over 1500 epochs. Since we divided our data set in test and train split, we also use the \texttt{InferenceRunner()} class provided by the tensorpack library to reduce overfitting and check for validation accuracy. 
+
+\subsubsection{Ensembling}
+In an attempt to improve accuracy, we tried using an ensemble of CNNs to provide more features for the RNN. Ensembling is a common technique used to reduce the variance of neural networks and improve generalization \cite{ensembles}. The CNN implementation is not affected by this, as the training process was just repeated 3 times to create independent models.\\
+For the RNN, we created a new training class which accepts several model paths (one could also use more than 3 models with this implementation at the cost of computational resources). Then, a FeaturePredictor is initiated for every stored model and their results are concatenated into a vector with $(128\cdot num_models)$ features which are then fed into the RNN.
 
 \section{Experiments and Results}
 %detailed description of what datasets we were using, what the results of the singular training for the CNN were, what the results for the RNN were
@@ -153,14 +158,34 @@ The CNN converges against an accuracy of 0.97 on the training set with a validat
 \end{figure}
 
 The validation accuracy seems rather low for a task like character recognition. This might be due to overfitting, very unclear images or just a suboptimal model. But note that the 5th and 6th layer of the CNN never get used at later stages anyways so only the accuracy of the 128D feature vectors (which still contain more information) matters. This cannot be determined directly but only through the loss of the RNN at later stages. \\
-The RNN converges against an accuracy of 1 on the training set and against 0.66 for the validation. Note here that this is an increase compared to the 0.62 of the CNN solely, meaning the context of the word significantly added to identification of the letters. Additionally, most words that are not correctly identified are only one letter off. For example the word "wraps" was identified as "wras" and "chandigarh" became "chandgarh".%maybe add graphic for these examples
-The whole training process is seen in figure \ref{fig:rnn_accuracy}. Note that the validation error starts to get bigger after a certain period of time, indicating the point at which overfitting to the test data starts. \\
+Generally, the CNN's architecture seems rather unconventional, as it uses large kernels without padding and uses maxout instead of maxpooling; maybe the authors try to "focus" the network on each images center as there can be multiple characters within one sliding window. However, we tried "ResNet" \cite{resnet1}, a more sophisticated architecture to compare against the CNN of \cite{2015arXiv150604395H}. The implementation follows \cite{resnet2} and was taken from \cite{tensorpack} with some modifications to use the IIIT5K dataset. As shown in figure~\ref{fig:resnet}, the results outperform our version of the CNN, cutting the remaining validation error in half, even without fine tuning of hyper-parameters (we only reduced the training length by a factor of 4 to account for the smaller dataset)
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\columnwidth]{graphics/resnet_accuracy.png}
+	\caption{\label{fig:resnet}Training process for the residual network (ResNet). Training accuracy on the left and validation accuracy on the right.}
+\end{figure}
+
+The RNN converges against an accuracy of 1 on the training set and achieves a validation accuracy of $0.68$ before it begins to overfit. Note here that this is an increase compared to the 0.62 of the CNN itself, suggesting the context of the word significantly added to identification of the letters. Additionally, most words that are not correctly identified are only one letter off, which suggests that the RNN's accuracy would be a lot higher if we used character distance as an accuracy measure. For example the word "wraps" was identified as "wras" and "chandigarh" became "chandgarh".%maybe add graphic for these examples
+The whole training process is seen in figure \ref{fig:rnn_accuracy}. It might be possible to improve validation accuracy by adding more regularization techniques (and by using more data).
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\columnwidth]{graphics/rnn_accuracy.png}
 	\caption{\label{fig:rnn_accuracy} Training process for the RNN. Training accuracy on the left, error in the center and validation error on the right.}
 \end{figure} 
+One thing we tried is using a CNN ensemble, i.e. separately training 3 CNNs and concatenating their 128D feature-vectors to provide a larger input with more information to the RNN. While the CNNs used for the ensemble achieved only between $0.51$ and $0.56$ validation accuracy, this improved the RNN to $\sim 0.72$, suggesting that this technique could be used to boost the model's results for high-performing CNNs as well. The training process of the 3 CNNs is displayed in figure~\ref{fig:cnn_ensemble} while the RNN's error is graphed in figure~\ref{fig:rnn_ensemble}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\columnwidth]{graphics/cnn_ensemble_accuracy.png}
+	\caption{\label{fig:cnn_ensemble} Training process for the CNNs used in the ensemble. Training accuracy on the left and validation accuracy on the right.}
+\end{figure} 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\columnwidth]{graphics/rnn_ensemble_accuracy.png}
+	\caption{\label{fig:rnn_ensemble} Training process for the RNN built on top of the ensemble. Training error on the left and validation error on the right.}
+\end{figure} 
+
 In comparison to the original, however, our results are rather unspectacular. Their accuracy was between 91,5 and 94 percent for the IIIT5K data set and even identified very ambiguous pictures. This difference could be caused by a number of reasons. First, they used additional datasets, which not only increases the amount, but also the diversity of the data, leading to better generalization properties. This applies to both CNN and RNN additively, as the better CNN also improves the limit of what the RNN can do. Then, the authors of the paper might have discovered some better hyper-parameter settings which were not explicitly mentioned in the publication, for example initialization variance and bias for the weights or the RNN's step size. Finally, they could have artificially extended their dataset with data augmentation (at least for the CNN training) by means such as random cropping or color scaling.
 
 \section{Conclusion}
@@ -168,7 +193,8 @@ In comparison to the original, however, our results are rather unspectacular. Th
 %name other papers that are related to this or follow up on it (and what they did better)
 The results that we achieved where slightly less impressive than those of the original publication. However, as explained above, there are a number of factors where our implementation could be improved in every step. The dataset used in training is relatively small compared to some other sets (e.g. MNIST), especially considering that IIIT5K contains highly different representations of each one. The generalization properties could be improved by adjusting the bias caused by the class imbalance in the dataset. The CNN and RNN both could be configured more optimally. One could also try propagating the RNNs error into the CNN, i.e. continue to adjust the CNNs weights during RNN training instead of completely separating the training process.\\
 Even small improvements in generalization, especially on character recognition level could increase the accuracy by a lot, since most "wrong" results are already very close to the actual label.\\
-Also, while the architecture of the CNN is unconventional, it is probably inferior to modern classification architectures. One could therefore try to replace it for example with a ResNet~\cite{resnet} as in the tensorpack example for CIFAR-10 (see \href{https://github.com/ppwwyyxx/tensorpack/blob/master/examples/ResNet/cifar10-resnet.py}{tensorpack's github}) to further improve accuracy.
+Also, while the architecture of the CNN is unconventional, it is probably inferior to modern classification architectures. As shown above, a ResNet \cite{resnet1} achieves much higher accuracy (with less fine-tuning), other state-of-the-art architectures used in classification might lead to an even larger boost. As the RNN's false predictions are usually only off by one character, even moderate improvements in the CNN could lead to a significantly higher performance of the final model.\\
+Ensembling shows some improvements over single CNNs as expected, this could also be applied to the modern architectures, especially if they are kept computationally efficient.
 %%am stück trainieren kommt mir sehr schwierig vor, das könnte extrem lange brauchen, bis man den fehler durch eine ganze sequenz und das RNN zurückpropagiert hat. pre-training vom CNN wird notwendig sein, allerdings könnte man im RNN training die fehler ins CNN weiterpropagieren ~Jan
 %There are a couple of improvements that could be done in future research projects that we would like to outline. A first idea would be to train the network not in 2 separate steps but rather as one end-to-end process. This would likely result in better outcomes since the entire CNN would already get information from the RNN and CTC through backpropagation. A second idea is to use a bigger data set of images for training. The IIIT5K seems like a good benchmark but due to the test train split, overfitting might have occured which might be solved by significantly bigger datasets. A third possibility is to train the CNN and RNN on significantly lower sliding window frame sizes, i.e. 2 instead of 8 %actually we are doing this. 
 \\
