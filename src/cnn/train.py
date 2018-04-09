@@ -35,7 +35,7 @@ class TrainCNNModel(ModelDesc):
         image, label = inputs
 
         logits = build_cnn(image)
-
+        """
         # print the predicted labels for the first data point in each step.
         logits = tf.Print(logits,
                           [tf.argmax(logits, dimension=1, name='prediction')],
@@ -47,7 +47,7 @@ class TrainCNNModel(ModelDesc):
                          [label],
                          summarize=8,
                          message="labels: ")
-
+        """
         # a vector of length B with loss of each sample
         cost = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=label)
         cost = tf.reduce_mean(cost, name='cross_entropy_loss')  # the average cross-entropy loss
@@ -65,9 +65,9 @@ class TrainCNNModel(ModelDesc):
 
         # Use a regex to find parameters to apply weight decay.
         # Here we apply a weight decay on all W (weight matrix) of all fc layers
-        # wd_cost = tf.multiply(1e-5,
-        #                      regularize_cost('fc.*/W', tf.nn.l2_loss),
-        #                      name='regularize_loss')
+#        wd_cost = tf.multiply(1e-5,
+#                              regularize_cost('fc.*/W', tf.nn.l2_loss),
+#                              name='regularize_loss')
         self.cost = tf.identity(cost, name='total_cost')
         summary.add_moving_summary(cost, self.cost)
 
@@ -77,16 +77,17 @@ class TrainCNNModel(ModelDesc):
 
     def _get_optimizer(self):
         # decay every x epoches by lr_decay_rate
-        lr = tf.train.exponential_decay(
-            learning_rate=1e-3,
-            global_step=get_global_step_var(),
-            decay_steps=5 * self.steps_per_epoch,  # 74 * 5,
-            decay_rate=self.lr_decay_rate, staircase=True, name='learning_rate')
-        # This will also put the summary in tensorboard, stat.json and print in terminal
-        # but this time without moving average
-        tf.summary.scalar('lr', lr)
+#        lr = tf.train.exponential_decay(
+#            learning_rate=1e-3,
+#            global_step=get_global_step_var(),
+#            decay_steps=5 * self.steps_per_epoch,  # 74 * 5,
+#            decay_rate=self.lr_decay_rate, staircase=True, name='learning_rate')
+#        # This will also put the summary in tensorboard, stat.json and print in terminal
+#        # but this time without moving average
+#        tf.summary.scalar('lr', lr)
 
-        return tf.train.AdamOptimizer(lr)
+#        return tf.train.AdamOptimizer(lr)
+        return tf.train.AdamOptimizer(5e-4)
 
 
 def get_data(unique=False, sub_data=None, batch_size=128):
@@ -116,7 +117,7 @@ def get_data(unique=False, sub_data=None, batch_size=128):
     return ds_train, ds_test
 
 
-def get_config(data, max_epoch=1500, lr_decay_rate=0.99, run_inference=True):
+def get_config(data, max_epoch=1500, lr_decay_rate=1.0, run_inference=True):
     dataset_train, dataset_test = data
 
     # How many iterations you want in each epoch.
@@ -162,7 +163,7 @@ def train(unique=False, sub_data=None, batch_size=None):
                     sub_data=sub_data,
                     batch_size=batch_size)
 
-    c = get_config(data, run_inference=False)
+    c = get_config(data, run_inference=True)
 
     #TODO change trainer
     launch_train_with_config(c, SimpleTrainer())

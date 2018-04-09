@@ -20,7 +20,7 @@ from cnn.maxgroup import Maxout2
 # from tensorflow.python.layers import maxout
 from data.utils import convert_image_to_array
 
-WEIGHT_INIT_VARIANCE = 0.001
+WEIGHT_INIT_VARIANCE = 2.0
 BIAS_INIT_VARIANCE = 1.0
 
 def w_init_variance(k_size=9):
@@ -57,6 +57,10 @@ def build_cnn(inputs):
                   .Maxout2('max3', num_unit=4)
                   .Conv2D('conv4', kernel_shape=1, out_channel=144)
                   .Maxout2('max4', num_unit=4)
+#                  ## implemented as two fully connected layers instead of 1x1 conv
+#                  ## and maxgroup to apply weight decay more easily
+#                  .FullyConnected('fc0', out_dim=144, nl=tf.nn.relu,
+#                                  b_init=tf.contrib.layers.variance_scaling_initializer(BIAS_INIT_VARIANCE))
                   # .pruneaxis('prune')
                   .FullyConnected('fc', out_dim=36, nl=FC_NL)
                   # .Maxout('maxfc', num_unit=4)
